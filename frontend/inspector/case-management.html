@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>PCRMS - Case Management</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f4f6f9;
+            color: #1f2937;
+        }
+
+        .header {
+            height: 70px;
+            background: #0f2041;
+            color: white;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            padding: 0 30px;
+        }
+
+        .logout-btn {
+            background: #dc3545;
+            border: none;
+            color: white;
+            padding: 10px 18px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .container {
+            padding: 30px;
+        }
+
+        .section {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .section h2 {
+            margin-bottom: 20px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        input,
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .full {
+            grid-column: 1 / -1;
+        }
+
+        button {
+            background: #0f2041;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #1c376d;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #e5e7eb;
+            text-align: left;
+        }
+
+        th {
+            background: #f8fafc;
+        }
+
+        #message {
+            margin-top: 15px;
+            font-weight: bold;
+        }
+
+        @media (max-width: 700px) {
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .full {
+                grid-column: auto;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<header class="header">
+
+    <h2>PCRMS | Case Management</h2>
+
+    <button class="logout-btn"
+            onclick="logout()">
+        Logout
+    </button>
+
+</header>
+
+
+<main class="container">
+
+    <div class="section">
+
+        <h2>Create Case</h2>
+
+        <form id="caseForm">
+
+            <div class="form-grid">
+
+                <div>
+                    <input
+                        type="text"
+                        id="caseNumber"
+                        placeholder="Case Number"
+                        required>
+                </div>
+
+                <div>
+                    <input
+                        type="text"
+                        id="firNumber"
+                        placeholder="FIR Number"
+                        required>
+                </div>
+
+                <div>
+                    <input
+                        type="text"
+                        id="title"
+                        placeholder="Case Title"
+                        required>
+                </div>
+
+                <div>
+                    <input
+                        type="text"
+                        id="investigatingOfficer"
+                        placeholder="Investigating Officer"
+                        required>
+                </div>
+
+                <div>
+                    <input
+                        type="date"
+                        id="openedDate"
+                        required>
+                </div>
+
+                <div class="full">
+
+                    <textarea
+                        id="description"
+                        placeholder="Case Description"></textarea>
+
+                </div>
+
+                <div>
+
+                    <button type="submit">
+                        Create Case
+                    </button>
+
+                </div>
+
+            </div>
+
+        </form>
+
+        <p id="message"></p>
+
+    </div>
+
+
+    <div class="section">
+
+        <h2>Cases</h2>
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>Case Number</th>
+                    <th>FIR Number</th>
+                    <th>Title</th>
+                    <th>Officer</th>
+                    <th>Date</th>
+                    <th>Status</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody id="caseTable">
+
+                <tr>
+                    <td colspan="6">
+                        Loading...
+                    </td>
+                </tr>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</main>
+
+
+<script>
+
+const userData =
+    sessionStorage.getItem("pcrmsUser");
+
+
+if (!userData) {
+
+    window.location.href =
+        "../index.html";
+
+}
+
+
+const user =
+    JSON.parse(userData);
+
+
+if (user.role !== "INSPECTOR") {
+
+    alert("Access denied.");
+
+    window.location.href =
+        "../index.html";
+
+}
+
+
+const caseForm =
+    document.getElementById("caseForm");
+
+
+const message =
+    document.getElementById("message");
+
+
+caseForm.addEventListener(
+    "submit",
+    async function(event) {
+
+        event.preventDefault();
+
+        const caseData = {
+
+            caseNumber:
+                document.getElementById(
+                    "caseNumber"
+                ).value,
+
+            firNumber:
+                document.getElementById(
+                    "firNumber"
+                ).value,
+
+            title:
+                document.getElementById(
+                    "title"
+                ).value,
+
+            investigatingOfficer:
+                document.getElementById(
+                    "investigatingOfficer"
+                ).value,
+
+            openedDate:
+                document.getElementById(
+                    "openedDate"
+                ).value,
+
+            description:
+                document.getElementById(
+                    "description"
+                ).value
+
+        };
+
+
+        try {
+
+            const response = await fetch(
+                "http://localhost:8080/api/cases",
+                {
+
+                    method: "POST",
+
+                    headers: {
+
+                        "Content-Type":
+                            "application/json",
+
+                        "Authorization":
+                            "Bearer " +
+                            user.token
+
+                    },
+
+                    body:
+                        JSON.stringify(caseData)
+
+                }
+            );
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    "Failed to create case"
+                );
+
+            }
+
+
+            message.textContent =
+                "Case created successfully.";
+
+            caseForm.reset();
+
+            loadCases();
+
+
+        } catch (error) {
+
+            console.error(error);
+
+            message.textContent =
+                "Failed to create case.";
+
+        }
+
+    }
+);
+
+
+async function loadCases() {
+
+    try {
+
+        const response = await fetch(
+            "http://localhost:8080/api/cases",
+            {
+
+                headers: {
+
+                    "Authorization":
+                        "Bearer " +
+                        user.token
+
+                }
+
+            }
+        );
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                "Failed to load cases"
+            );
+
+        }
+
+
+        const cases =
+            await response.json();
+
+
+        const table =
+            document.getElementById(
+                "caseTable"
+            );
+
+
+        if (cases.length === 0) {
+
+            table.innerHTML = `
+                <tr>
+                    <td colspan="6">
+                        No cases available.
+                    </td>
+                </tr>
+            `;
+
+            return;
+
+        }
+
+
+        table.innerHTML =
+            cases.map(caseData => `
+
+                <tr>
+
+                    <td>
+                        ${caseData.caseNumber}
+                    </td>
+
+                    <td>
+                        ${caseData.firNumber}
+                    </td>
+
+                    <td>
+                        ${caseData.title}
+                    </td>
+
+                    <td>
+                        ${caseData.investigatingOfficer}
+                    </td>
+
+                    <td>
+                        ${caseData.openedDate}
+                    </td>
+
+                    <td>
+                        ${caseData.status}
+                    </td>
+
+                </tr>
+
+            `).join("");
+
+
+    } catch (error) {
+
+        console.error(error);
+
+        document.getElementById(
+            "caseTable"
+        ).innerHTML = `
+            <tr>
+                <td colspan="6">
+                    Unable to load cases.
+                </td>
+            </tr>
+        `;
+
+    }
+
+}
+
+
+function logout() {
+
+    sessionStorage.removeItem(
+        "pcrmsUser"
+    );
+
+    window.location.href =
+        "../index.html";
+
+}
+
+
+loadCases();
+
+</script>
+
+</body>
+
+</html>

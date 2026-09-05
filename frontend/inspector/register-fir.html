@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Register FIR - PCRMS</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f6f9;
+        }
+
+        .header {
+            background: #0f2041;
+            color: white;
+            padding: 20px 30px;
+        }
+
+        .header h1 {
+            margin: 0;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 30px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.1);
+        }
+
+        .container h2 {
+            color: #0f2041;
+            margin-top: 0;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 7px;
+            font-weight: bold;
+        }
+
+        input,
+        textarea {
+            width: 100%;
+            padding: 11px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 15px;
+        }
+
+        textarea {
+            height: 120px;
+            resize: vertical;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 25px;
+        }
+
+        button,
+        .back-btn {
+            padding: 12px 22px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 15px;
+            text-decoration: none;
+        }
+
+        .submit-btn {
+            background: #0f2041;
+            color: white;
+        }
+
+        .back-btn {
+            background: #ddd;
+            color: #222;
+        }
+
+        #message {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="header">
+        <h1>Police Crime Record Management System</h1>
+    </div>
+
+    <div class="container">
+
+        <h2>Register First Information Report</h2>
+
+        <form id="firForm">
+
+            <div class="form-group">
+                <label for="firNumber">FIR Number</label>
+                <input
+                    type="text"
+                    id="firNumber"
+                    placeholder="Example: FIR-2026-001"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="date">Date</label>
+                <input
+                    type="date"
+                    id="date"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="complainantName">Complainant Name</label>
+                <input
+                    type="text"
+                    id="complainantName"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="complainantContact">Complainant Contact</label>
+                <input
+                    type="text"
+                    id="complainantContact"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="incidentLocation">Incident Location</label>
+                <input
+                    type="text"
+                    id="incidentLocation"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="description">Incident Description</label>
+                <textarea
+                    id="description"
+                    placeholder="Enter details of the incident..."
+                    required
+                ></textarea>
+            </div>
+
+            <div class="buttons">
+
+                <button
+                    type="submit"
+                    class="submit-btn">
+                    Register FIR
+                </button>
+
+                <a
+                    href="dashboard.html"
+                    class="back-btn">
+                    Back to Dashboard
+                </a>
+
+            </div>
+
+        </form>
+
+        <div id="message"></div>
+
+    </div>
+
+    <script>
+
+        const userData =
+            sessionStorage.getItem("pcrmsUser");
+
+        if (!userData) {
+            window.location.href = "../index.html";
+        }
+
+        const user = JSON.parse(userData);
+
+        if (user.role !== "INSPECTOR") {
+            alert("Access denied.");
+            window.location.href = "../index.html";
+        }
+
+        document
+            .getElementById("firForm")
+            .addEventListener("submit", async function(event) {
+
+                event.preventDefault();
+
+                const message =
+                    document.getElementById("message");
+
+                message.textContent = "Registering FIR...";
+
+                const fir = {
+
+                    firNumber:
+                        document.getElementById("firNumber").value,
+
+                    date:
+                        document.getElementById("date").value,
+
+                    complainantName:
+                        document.getElementById("complainantName").value,
+
+                    complainantContact:
+                        document.getElementById("complainantContact").value,
+
+                    incidentLocation:
+                        document.getElementById("incidentLocation").value,
+
+                    description:
+                        document.getElementById("description").value
+                };
+
+                try {
+
+                    const response = await fetch(
+                        "http://localhost:8080/api/firs",
+                        {
+                            method: "POST",
+
+                            headers: {
+                                "Content-Type": "application/json",
+                                "Authorization":
+                                    "Bearer " + user.token
+                            },
+
+                            body: JSON.stringify(fir)
+                        }
+                    );
+
+                    if (!response.ok) {
+
+                        message.textContent =
+                            "Failed to register FIR. FIR number may already exist.";
+
+                        return;
+                    }
+
+                    const savedFIR =
+                        await response.json();
+
+                    message.textContent =
+                        "FIR registered successfully! FIR Number: "
+                        + savedFIR.firNumber;
+
+                    document
+                        .getElementById("firForm")
+                        .reset();
+
+                } catch (error) {
+
+                    console.error(error);
+
+                    message.textContent =
+                        "Unable to connect to the server.";
+                }
+
+            });
+
+    </script>
+
+</body>
+</html>

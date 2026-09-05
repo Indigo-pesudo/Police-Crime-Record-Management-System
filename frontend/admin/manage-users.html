@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Manage Users | PCRMS</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f4f6f9;
+            color: #222;
+        }
+
+        header {
+            background: #0f2041;
+            color: white;
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h2 {
+            font-size: 22px;
+        }
+
+        .logout-btn {
+            background: #d9534f;
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .logout-btn:hover {
+            background: #c9302c;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1100px;
+            margin: 30px auto;
+        }
+
+        .back-btn {
+            display: inline-block;
+            text-decoration: none;
+            color: #0f2041;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .form-card,
+        .table-card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            margin-bottom: 25px;
+        }
+
+        .form-card h2,
+        .table-card h2 {
+            color: #0f2041;
+            margin-bottom: 20px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            margin-bottom: 6px;
+            font-weight: bold;
+        }
+
+        .form-group input,
+        .form-group select {
+            padding: 11px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 15px;
+        }
+
+        .create-btn {
+            margin-top: 20px;
+            background: #0f2041;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 15px;
+        }
+
+        .create-btn:hover {
+            background: #1b376d;
+        }
+
+        #message {
+            margin-top: 15px;
+            font-weight: bold;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            padding: 13px;
+            border-bottom: 1px solid #ddd;
+            text-align: left;
+        }
+
+        th {
+            background: #0f2041;
+            color: white;
+        }
+
+        tr:hover {
+            background: #f5f5f5;
+        }
+
+        .status-active {
+            color: green;
+            font-weight: bold;
+        }
+
+        .status-inactive {
+            color: red;
+            font-weight: bold;
+        }
+
+        .status-btn {
+            border: none;
+            padding: 7px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            background: #555;
+            color: white;
+        }
+
+        .status-btn:hover {
+            background: #333;
+        }
+
+        @media (max-width: 700px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .table-card {
+                overflow-x: auto;
+            }
+
+            table {
+                min-width: 700px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h2>PCRMS | Manage Users</h2>
+
+    <button class="logout-btn" onclick="logout()">
+        Logout
+    </button>
+</header>
+
+
+<div class="container">
+
+    <a href="dashboard.html" class="back-btn">
+        ← Back to Dashboard
+    </a>
+
+
+    <!-- CREATE USER -->
+    <div class="form-card">
+
+        <h2>Create New User</h2>
+
+        <form id="createUserForm">
+
+            <div class="form-grid">
+
+                <div class="form-group">
+                    <label for="fullName">
+                        Full Name
+                    </label>
+
+                    <input
+                        type="text"
+                        id="fullName"
+                        placeholder="Enter full name"
+                        required
+                    >
+                </div>
+
+
+                <div class="form-group">
+                    <label for="username">
+                        Username
+                    </label>
+
+                    <input
+                        type="text"
+                        id="username"
+                        placeholder="Enter username"
+                        required
+                    >
+                </div>
+
+
+                <div class="form-group">
+                    <label for="password">
+                        Password
+                    </label>
+
+                    <input
+                        type="password"
+                        id="password"
+                        placeholder="Enter password"
+                        required
+                    >
+                </div>
+
+
+                <div class="form-group">
+                    <label for="role">
+                        Role
+                    </label>
+
+                    <select id="role" required>
+
+                        <option value="">
+                            Select Role
+                        </option>
+
+                        <option value="INSPECTOR">
+                            Inspector
+                        </option>
+
+                        <option value="CLERK">
+                            Clerk
+                        </option>
+
+                    </select>
+                </div>
+
+            </div>
+
+
+            <button type="submit" class="create-btn">
+                Create User
+            </button>
+
+            <div id="message"></div>
+
+        </form>
+
+    </div>
+
+
+    <!-- USERS TABLE -->
+    <div class="table-card">
+
+        <h2>System Users</h2>
+
+        <table>
+
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Username</th>
+                    <th>Role</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+
+            <tbody id="usersTableBody">
+
+                <tr>
+                    <td colspan="6">
+                        Loading users...
+                    </td>
+                </tr>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+
+<script>
+
+    // Get logged-in user
+    const userData = sessionStorage.getItem("pcrmsUser");
+
+
+    // Check login
+    if (!userData) {
+
+        window.location.href = "../index.html";
+
+    }
+
+
+    const user = JSON.parse(userData);
+
+
+    // Check admin role
+    if (user.role !== "ADMIN") {
+
+        alert("Access denied.");
+
+        window.location.href = "../index.html";
+
+    }
+
+
+    // CREATE USER
+    document
+        .getElementById("createUserForm")
+        .addEventListener("submit", async function(event) {
+
+            event.preventDefault();
+
+
+            const fullName =
+                document.getElementById("fullName").value;
+
+            const username =
+                document.getElementById("username").value;
+
+            const password =
+                document.getElementById("password").value;
+
+            const role =
+                document.getElementById("role").value;
+
+
+            const message =
+                document.getElementById("message");
+
+
+            message.textContent = "";
+
+
+            try {
+
+                const response = await fetch(
+                    "http://localhost:8080/api/admin/users",
+                    {
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Authorization":
+                                "Bearer " + user.token
+                        },
+
+                        body: JSON.stringify({
+                            fullName: fullName,
+                            username: username,
+                            password: password,
+                            role: role
+                        })
+                    }
+                );
+
+
+                if (!response.ok) {
+
+                    const error =
+                        await response.text();
+
+                    throw new Error(error);
+
+                }
+
+
+                message.style.color = "green";
+
+                message.textContent =
+                    "User created successfully!";
+
+
+                // Clear form
+                document
+                    .getElementById("createUserForm")
+                    .reset();
+
+
+                // Reload users
+                loadUsers();
+
+
+            } catch (error) {
+
+                console.error(error);
+
+                message.style.color = "red";
+
+                message.textContent =
+                    "Failed to create user.";
+
+            }
+
+        });
+
+
+    // LOAD USERS
+    async function loadUsers() {
+
+        const tableBody =
+            document.getElementById("usersTableBody");
+
+
+        try {
+
+            const response = await fetch(
+                "http://localhost:8080/api/admin/users",
+                {
+                    method: "GET",
+
+                    headers: {
+                        "Authorization":
+                            "Bearer " + user.token
+                    }
+                }
+            );
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    "Failed to load users"
+                );
+
+            }
+
+
+            const users =
+                await response.json();
+
+
+            tableBody.innerHTML = "";
+
+
+            users.forEach(function(currentUser) {
+
+                const row =
+                    document.createElement("tr");
+
+
+                const statusClass =
+                    currentUser.active
+                        ? "status-active"
+                        : "status-inactive";
+
+
+                const statusText =
+                    currentUser.active
+                        ? "Active"
+                        : "Inactive";
+
+
+                row.innerHTML = `
+
+                    <td>${currentUser.id}</td>
+
+                    <td>${currentUser.fullName}</td>
+
+                    <td>${currentUser.username}</td>
+
+                    <td>${currentUser.role}</td>
+
+                    <td class="${statusClass}">
+                        ${statusText}
+                    </td>
+
+                    <td>
+
+                        ${
+                            currentUser.role === "ADMIN"
+                            ? "-"
+                            : `
+                                <button
+                                    class="status-btn"
+                                    onclick="toggleStatus(
+                                        ${currentUser.id},
+                                        ${currentUser.active}
+                                    )"
+                                >
+                                    ${
+                                        currentUser.active
+                                        ? "Deactivate"
+                                        : "Activate"
+                                    }
+                                </button>
+                            `
+                        }
+
+                    </td>
+
+                `;
+
+
+                tableBody.appendChild(row);
+
+            });
+
+
+        } catch (error) {
+
+            console.error(error);
+
+            tableBody.innerHTML = `
+
+                <tr>
+
+                    <td colspan="6">
+                        Failed to load users.
+                    </td>
+
+                </tr>
+
+            `;
+
+        }
+
+    }
+
+
+    // ACTIVATE / DEACTIVATE USER
+    async function toggleStatus(id, currentStatus) {
+
+        const newStatus = !currentStatus;
+
+
+        try {
+
+            const response = await fetch(
+
+                `http://localhost:8080/api/admin/users/${id}/status?active=${newStatus}`,
+
+                {
+                    method: "PUT",
+
+                    headers: {
+                        "Authorization":
+                            "Bearer " + user.token
+                    }
+                }
+
+            );
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    "Failed to update status"
+                );
+
+            }
+
+
+            loadUsers();
+
+
+        } catch (error) {
+
+            console.error(error);
+
+            alert(
+                "Failed to update user status."
+            );
+
+        }
+
+    }
+
+
+    // LOGOUT
+    function logout() {
+
+        sessionStorage.removeItem("pcrmsUser");
+
+        window.location.href =
+            "../index.html";
+
+    }
+
+
+    // Load users when page opens
+    loadUsers();
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>FIR Records - PCRMS</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            margin: 0;
+            background: #f4f6f9;
+            color: #1f2937;
+        }
+
+        .header {
+            background: #0f2041;
+            color: white;
+            padding: 20px 30px;
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h2 {
+            margin: 0;
+        }
+
+        .logout-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .container {
+            padding: 30px;
+        }
+
+        .top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .back-btn {
+            text-decoration: none;
+            background: #0f2041;
+            color: white;
+            padding: 11px 18px;
+            border-radius: 6px;
+        }
+
+        .table-container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            overflow-x: auto;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            padding: 13px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background: #0f2041;
+            color: white;
+        }
+
+        .status {
+            background: #dbeafe;
+            color: #1e40af;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 13px;
+        }
+
+        #message {
+            padding: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header class="header">
+
+        <h2>PCRMS | FIR Records</h2>
+
+        <button class="logout-btn" onclick="logout()">
+            Logout
+        </button>
+
+    </header>
+
+    <main class="container">
+
+        <div class="top">
+
+            <h1>Registered FIRs</h1>
+
+            <a href="dashboard.html" class="back-btn">
+                Back to Dashboard
+            </a>
+
+        </div>
+
+        <div class="table-container">
+
+            <table>
+
+                <thead>
+                    <tr>
+                        <th>FIR Number</th>
+                        <th>Date</th>
+                        <th>Complainant</th>
+                        <th>Contact</th>
+                        <th>Location</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+
+                <tbody id="firTableBody">
+                </tbody>
+
+            </table>
+
+            <div id="message">
+                Loading FIR records...
+            </div>
+
+        </div>
+
+    </main>
+
+    <script>
+
+        const userData =
+            sessionStorage.getItem("pcrmsUser");
+
+        if (!userData) {
+            window.location.href = "../index.html";
+        }
+
+        const user = JSON.parse(userData);
+
+        if (user.role !== "INSPECTOR") {
+            alert("Access denied.");
+            window.location.href = "../index.html";
+        }
+
+        async function loadFIRs() {
+
+            try {
+
+                const response = await fetch(
+                    "http://localhost:8080/api/firs",
+                    {
+                        method: "GET",
+
+                        headers: {
+                            "Authorization":
+                                "Bearer " + user.token
+                        }
+                    }
+                );
+
+                if (!response.ok) {
+                    throw new Error("Failed to load FIRs");
+                }
+
+                const firs = await response.json();
+
+                const tableBody =
+                    document.getElementById("firTableBody");
+
+                const message =
+                    document.getElementById("message");
+
+                tableBody.innerHTML = "";
+
+                if (firs.length === 0) {
+
+                    message.textContent =
+                        "No FIR records found.";
+
+                    return;
+                }
+
+                message.textContent = "";
+
+                firs.forEach(fir => {
+
+                    const row =
+                        document.createElement("tr");
+
+                    row.innerHTML = `
+                        <td>${fir.firNumber}</td>
+                        <td>${fir.date}</td>
+                        <td>${fir.complainantName}</td>
+                        <td>${fir.complainantContact}</td>
+                        <td>${fir.incidentLocation}</td>
+                        <td>
+                            <span class="status">
+                                ${fir.status}
+                            </span>
+                        </td>
+                    `;
+
+                    tableBody.appendChild(row);
+
+                });
+
+            } catch (error) {
+
+                console.error(error);
+
+                document.getElementById("message")
+                    .textContent =
+                    "Unable to load FIR records.";
+
+            }
+
+        }
+
+        function logout() {
+
+            sessionStorage.removeItem("pcrmsUser");
+
+            window.location.href =
+                "../index.html";
+
+        }
+
+        loadFIRs();
+
+    </script>
+
+</body>
+
+</html>

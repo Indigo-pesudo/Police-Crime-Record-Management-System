@@ -1,4 +1,21 @@
-*.class
+# Maven
+backend/target/
+
+# Logs
+*.log
+
+# IDE
+.idea/
 .vscode/
-out/
-bin/
+*.iml
+
+# Java
+*.class
+
+# Environment / secrets
+.env
+*.env
+
+# OS
+.DS_Store
+Thumbs.db
