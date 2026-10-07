@@ -5,9 +5,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>FIR Records - PCRMS</title>
+    <title>View FIRs - PCRMS</title>
 
     <style>
+
         * {
             box-sizing: border-box;
             font-family: Arial, sans-serif;
@@ -33,147 +34,209 @@
             margin: 0;
         }
 
-        .logout-btn {
-            background: #dc3545;
+        .back-btn {
             color: white;
-            border: none;
-            padding: 10px 18px;
+            text-decoration: none;
+            background: #1c376d;
+            padding: 10px 16px;
             border-radius: 6px;
-            cursor: pointer;
         }
 
         .container {
-            padding: 30px;
+            width: 95%;
+            max-width: 1200px;
+            margin: 30px auto;
         }
 
-        .top {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+
+            box-shadow:
+                0 2px 8px rgba(0,0,0,0.08);
         }
 
-        .back-btn {
-            text-decoration: none;
-            background: #0f2041;
-            color: white;
-            padding: 11px 18px;
-            border-radius: 6px;
+        h1 {
+            color: #0f2041;
+            margin-top: 0;
         }
 
         .table-container {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
             overflow-x: auto;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-        }
-
-        th,
-        td {
-            padding: 13px;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
+            margin-top: 20px;
         }
 
         th {
             background: #0f2041;
             color: white;
+            padding: 13px;
+            text-align: left;
+        }
+
+        td {
+            padding: 13px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        tr:hover {
+            background: #f8f9fb;
+        }
+
+        .view-btn {
+            background: #0f2041;
+            color: white;
+            text-decoration: none;
+            padding: 7px 12px;
+            border-radius: 5px;
+        }
+
+        .view-btn:hover {
+            background: #1c376d;
         }
 
         .status {
-            background: #dbeafe;
-            color: #1e40af;
-            padding: 5px 10px;
-            border-radius: 15px;
-            font-size: 13px;
+            font-weight: bold;
         }
 
-        #message {
+        .loading,
+        .error,
+        .empty {
             padding: 20px;
             text-align: center;
         }
+
+        .error {
+            color: #b00020;
+        }
+
     </style>
+
 </head>
+
 
 <body>
 
-    <header class="header">
 
-        <h2>PCRMS | FIR Records</h2>
+<header class="header">
 
-        <button class="logout-btn" onclick="logout()">
-            Logout
-        </button>
+    <h2>PCRMS | View FIRs</h2>
 
-    </header>
+    <a href="dashboard.html" class="back-btn">
+        ← Dashboard
+    </a>
 
-    <main class="container">
+</header>
 
-        <div class="top">
 
-            <h1>Registered FIRs</h1>
+<div class="container">
 
-            <a href="dashboard.html" class="back-btn">
-                Back to Dashboard
-            </a>
+    <div class="card">
 
-        </div>
+        <h1>Registered FIRs</h1>
 
         <div class="table-container">
 
             <table>
 
                 <thead>
+
                     <tr>
+
                         <th>FIR Number</th>
+
                         <th>Date</th>
+
                         <th>Complainant</th>
-                        <th>Contact</th>
+
                         <th>Location</th>
+
                         <th>Status</th>
+
+                        <th>Action</th>
+
                     </tr>
+
                 </thead>
 
+
                 <tbody id="firTableBody">
+
+                    <tr>
+
+                        <td colspan="6" class="loading">
+                            Loading FIRs...
+                        </td>
+
+                    </tr>
+
                 </tbody>
 
             </table>
 
-            <div id="message">
-                Loading FIR records...
-            </div>
-
         </div>
 
-    </main>
+    </div>
 
-    <script>
+</div>
 
-        const userData =
-            sessionStorage.getItem("pcrmsUser");
 
-        if (!userData) {
-            window.location.href = "../index.html";
-        }
+<script>
 
-        const user = JSON.parse(userData);
 
-        if (user.role !== "INSPECTOR") {
-            alert("Access denied.");
-            window.location.href = "../index.html";
-        }
+    // =========================
+    // CHECK LOGIN
+    // =========================
 
-        async function loadFIRs() {
+    const userData =
+        sessionStorage.getItem("pcrmsUser");
 
-            try {
 
-                const response = await fetch(
+    if (!userData) {
+
+        window.location.href =
+            "../index.html";
+
+    }
+
+
+    const user =
+        JSON.parse(userData);
+
+
+    // =========================
+    // CHECK ROLE
+    // =========================
+
+    if (user.role !== "INSPECTOR") {
+
+        alert("Access denied.");
+
+        window.location.href =
+            "../index.html";
+
+    }
+
+
+    // =========================
+    // LOAD FIRs
+    // =========================
+
+    async function loadFIRs() {
+
+        const tableBody =
+            document.getElementById("firTableBody");
+
+
+        try {
+
+            const response =
+                await fetch(
                     "http://localhost:8080/api/firs",
                     {
                         method: "GET",
@@ -185,76 +248,159 @@
                     }
                 );
 
-                if (!response.ok) {
-                    throw new Error("Failed to load FIRs");
-                }
 
-                const firs = await response.json();
+            if (!response.ok) {
 
-                const tableBody =
-                    document.getElementById("firTableBody");
-
-                const message =
-                    document.getElementById("message");
-
-                tableBody.innerHTML = "";
-
-                if (firs.length === 0) {
-
-                    message.textContent =
-                        "No FIR records found.";
-
-                    return;
-                }
-
-                message.textContent = "";
-
-                firs.forEach(fir => {
-
-                    const row =
-                        document.createElement("tr");
-
-                    row.innerHTML = `
-                        <td>${fir.firNumber}</td>
-                        <td>${fir.date}</td>
-                        <td>${fir.complainantName}</td>
-                        <td>${fir.complainantContact}</td>
-                        <td>${fir.incidentLocation}</td>
-                        <td>
-                            <span class="status">
-                                ${fir.status}
-                            </span>
-                        </td>
-                    `;
-
-                    tableBody.appendChild(row);
-
-                });
-
-            } catch (error) {
-
-                console.error(error);
-
-                document.getElementById("message")
-                    .textContent =
-                    "Unable to load FIR records.";
+                throw new Error(
+                    "Failed to load FIRs"
+                );
 
             }
 
+
+            const firs =
+                await response.json();
+
+
+            // =========================
+            // NO FIRs
+            // =========================
+
+            if (firs.length === 0) {
+
+                tableBody.innerHTML = `
+
+                    <tr>
+
+                        <td
+                            colspan="6"
+                            class="empty">
+
+                            No FIRs registered yet.
+
+                        </td>
+
+                    </tr>
+
+                `;
+
+                return;
+
+            }
+
+
+            // =========================
+            // DISPLAY FIRs
+            // =========================
+
+            tableBody.innerHTML =
+                firs.map(fir => `
+
+                    <tr>
+
+                        <td>
+                            ${escapeHtml(
+                                fir.firNumber ?? ""
+                            )}
+                        </td>
+
+                        <td>
+                            ${escapeHtml(
+                                fir.date ?? ""
+                            )}
+                        </td>
+
+                        <td>
+                            ${escapeHtml(
+                                fir.complainantName ?? ""
+                            )}
+                        </td>
+
+                        <td>
+                            ${escapeHtml(
+                                fir.incidentLocation ?? ""
+                            )}
+                        </td>
+
+                        <td class="status">
+                            ${escapeHtml(
+                                fir.status ?? ""
+                            )}
+                        </td>
+
+                        <td>
+
+                            <a
+                                href="fir-details.html?id=${fir.id}"
+                                class="view-btn">
+
+                                View Details
+
+                            </a>
+
+                        </td>
+
+                    </tr>
+
+                `).join("");
+
+
+        } catch (error) {
+
+            console.error(error);
+
+
+            tableBody.innerHTML = `
+
+                <tr>
+
+                    <td
+                        colspan="6"
+                        class="error">
+
+                        Unable to load FIR data.
+
+                    </td>
+
+                </tr>
+
+            `;
+
         }
 
-        function logout() {
+    }
 
-            sessionStorage.removeItem("pcrmsUser");
 
-            window.location.href =
-                "../index.html";
+    // =========================
+    // HTML SECURITY
+    // =========================
 
-        }
+    function escapeHtml(value) {
 
-        loadFIRs();
+        return String(value)
 
-    </script>
+            .replaceAll("&", "&amp;")
+
+            .replaceAll("<", "&lt;")
+
+            .replaceAll(">", "&gt;")
+
+            .replaceAll('"', "&quot;")
+
+            .replaceAll("'", "&#039;");
+
+    }
+
+
+    // =========================
+    // START
+    // =========================
+
+    loadFIRs();
+
+
+</script>
+
 
 </body>
 

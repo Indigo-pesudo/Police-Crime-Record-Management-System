@@ -105,9 +105,29 @@ public class SecurityConfig {
 
         .requestMatchers("/api/admin/**")
         .hasRole("ADMIN")
+        .requestMatchers("/api/reports/**")
+        .hasAnyRole("ADMIN", "INSPECTOR", "CLERK")
+        .requestMatchers(HttpMethod.GET, "/api/cases/fir/**")
+        .hasAnyRole("ADMIN", "INSPECTOR", "CLERK")
 
         .requestMatchers("/api/cases/**")
         .hasRole("INSPECTOR")
+
+        .requestMatchers("/api/firs/search").hasAnyRole("ADMIN", "INSPECTOR", "CLERK")
+        .requestMatchers("/api/criminal-records/search")
+    .hasAnyRole("ADMIN", "INSPECTOR", "CLERK")
+
+.requestMatchers("/api/criminal-records/**")
+    .hasAnyRole("ADMIN", "INSPECTOR", "CLERK")
+
+    .requestMatchers("/api/criminal-fir-links/**")
+    .hasAnyRole("ADMIN", "INSPECTOR", "CLERK")
+
+    .requestMatchers("/api/evidence/**")
+    .hasAnyRole("ADMIN", "INSPECTOR", "CLERK")
+
+    .requestMatchers("/api/evidence-transfers/**")
+    .hasAnyRole("ADMIN", "INSPECTOR", "CLERK")
 
         .anyRequest()
         .authenticated()

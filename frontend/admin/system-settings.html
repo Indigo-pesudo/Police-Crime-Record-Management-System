@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <title>PCRMS - System Settings</title>
+
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+
+        body {
+            background: #f4f6f9;
+            color: #1f2937;
+            min-height: 100vh;
+        }
+
+
+        /* HEADER */
+
+        .header {
+            height: 70px;
+
+            background: #0f2041;
+
+            color: white;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            padding: 0 30px;
+        }
+
+
+        .header h2 {
+            font-size: 22px;
+        }
+
+
+        .header-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+
+        .header-btn {
+            border: none;
+
+            padding: 10px 16px;
+
+            border-radius: 6px;
+
+            cursor: pointer;
+
+            font-weight: bold;
+        }
+
+
+        .dashboard-btn {
+            background: white;
+            color: #0f2041;
+        }
+
+
+        .logout-btn {
+            background: #dc3545;
+            color: white;
+        }
+
+
+        .dashboard-btn:hover {
+            background: #e5e7eb;
+        }
+
+
+        .logout-btn:hover {
+            background: #b02a37;
+        }
+
+
+        /* CONTAINER */
+
+        .container {
+            max-width: 1000px;
+
+            margin: 40px auto;
+
+            padding: 0 25px;
+        }
+
+
+        /* BACK BUTTON */
+
+        .back {
+            display: inline-block;
+
+            margin-bottom: 25px;
+
+            color: #0f2041;
+
+            text-decoration: none;
+
+            font-weight: bold;
+        }
+
+
+        .back:hover {
+            text-decoration: underline;
+        }
+
+
+        /* TITLE */
+
+        .title {
+            margin-bottom: 25px;
+        }
+
+
+        .title h1 {
+            margin-bottom: 8px;
+        }
+
+
+        .title p {
+            color: #6b7280;
+        }
+
+
+        /* SECTION */
+
+        .section {
+            background: white;
+
+            padding: 25px;
+
+            margin-bottom: 25px;
+
+            border-radius: 10px;
+
+            box-shadow:
+                0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+
+        .section h2 {
+            color: #0f2041;
+
+            margin-bottom: 20px;
+        }
+
+
+        /* SETTINGS GRID */
+
+        .settings-grid {
+            display: grid;
+
+            grid-template-columns:
+                repeat(2, 1fr);
+
+            gap: 15px;
+        }
+
+
+        .setting {
+            border: 1px solid #e5e7eb;
+
+            border-radius: 8px;
+
+            padding: 18px;
+
+            background: #f9fafb;
+        }
+
+
+        .setting-label {
+            color: #6b7280;
+
+            font-size: 13px;
+
+            margin-bottom: 7px;
+        }
+
+
+        .setting-value {
+            color: #111827;
+
+            font-weight: bold;
+
+            word-break: break-word;
+        }
+
+
+        /* STATUS */
+
+        .status {
+            display: inline-block;
+
+            padding: 6px 12px;
+
+            border-radius: 5px;
+
+            background: #1f7a4d;
+
+            color: white;
+
+            font-size: 13px;
+
+            font-weight: bold;
+        }
+
+
+        /* SESSION SECTION */
+
+        .danger-section {
+            border-left: 5px solid #dc3545;
+        }
+
+
+        .danger-section h2 {
+            color: #dc3545;
+        }
+
+
+        .danger-text {
+            margin-bottom: 15px;
+
+            color: #6b7280;
+        }
+
+
+        .danger-btn {
+            background: #dc3545;
+
+            color: white;
+
+            border: none;
+
+            padding: 12px 18px;
+
+            border-radius: 6px;
+
+            cursor: pointer;
+
+            font-weight: bold;
+        }
+
+
+        .danger-btn:hover {
+            background: #b02a37;
+        }
+
+
+        /* RESPONSIVE */
+
+        @media (max-width: 700px) {
+
+            .header {
+                height: auto;
+
+                padding: 15px;
+
+                flex-direction: column;
+
+                gap: 15px;
+            }
+
+
+            .settings-grid {
+                grid-template-columns: 1fr;
+            }
+
+
+            .container {
+                margin: 25px auto;
+
+                padding: 0 15px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<!-- HEADER -->
+
+<header class="header">
+
+
+    <h2>
+        PCRMS | Admin Panel
+    </h2>
+
+
+    <div class="header-buttons">
+
+
+        <button
+            class="header-btn dashboard-btn"
+            onclick="goToDashboard()">
+
+            Dashboard
+
+        </button>
+
+
+        <button
+            class="header-btn logout-btn"
+            onclick="logout()">
+
+            Logout
+
+        </button>
+
+
+    </div>
+
+
+</header>
+
+
+
+<!-- MAIN CONTENT -->
+
+<main class="container">
+
+
+    <a
+        href="dashboard.html"
+        class="back">
+
+        ← Back to Dashboard
+
+    </a>
+
+
+
+    <!-- TITLE -->
+
+    <div class="title">
+
+        <h1>
+            System Settings
+        </h1>
+
+        <p>
+            PCRMS system information and administrator settings
+        </p>
+
+    </div>
+
+
+
+    <!-- SYSTEM INFORMATION -->
+
+    <div class="section">
+
+        <h2>
+            System Information
+        </h2>
+
+
+        <div class="settings-grid">
+
+
+            <div class="setting">
+
+                <div class="setting-label">
+                    Application
+                </div>
+
+                <div class="setting-value">
+                    Police Crime Record Management System
+                </div>
+
+            </div>
+
+
+
+            <div class="setting">
+
+                <div class="setting-label">
+                    Backend
+                </div>
+
+                <div class="setting-value">
+                    Spring Boot
+                </div>
+
+            </div>
+
+
+
+            <div class="setting">
+
+                <div class="setting-label">
+                    Database
+                </div>
+
+                <div class="setting-value">
+                    MySQL
+                </div>
+
+            </div>
+
+
+
+            <div class="setting">
+
+                <div class="setting-label">
+                    Frontend
+                </div>
+
+                <div class="setting-value">
+                    HTML / CSS / JavaScript
+                </div>
+
+            </div>
+
+
+
+            <div class="setting">
+
+                <div class="setting-label">
+                    Backend Server
+                </div>
+
+                <div class="setting-value">
+                    localhost:8080
+                </div>
+
+            </div>
+
+
+
+            <div class="setting">
+
+                <div class="setting-label">
+                    System Status
+                </div>
+
+                <div class="setting-value">
+
+                    <span class="status">
+                        Active
+                    </span>
+
+                </div>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+
+
+    <!-- CURRENT ADMIN -->
+
+    <div class="section">
+
+        <h2>
+            Current Administrator
+        </h2>
+
+
+        <div class="settings-grid">
+
+
+            <div class="setting">
+
+                <div class="setting-label">
+                    Username
+                </div>
+
+                <div
+                    class="setting-value"
+                    id="username">
+
+                    -
+
+                </div>
+
+            </div>
+
+
+
+            <div class="setting">
+
+                <div class="setting-label">
+                    Full Name
+                </div>
+
+                <div
+                    class="setting-value"
+                    id="fullName">
+
+                    -
+
+                </div>
+
+            </div>
+
+
+
+            <div class="setting">
+
+                <div class="setting-label">
+                    Role
+                </div>
+
+                <div
+                    class="setting-value"
+                    id="role">
+
+                    -
+
+                </div>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+
+
+    <!-- APPLICATION SETTINGS -->
+
+    <div class="section">
+
+        <h2>
+            Application Settings
+        </h2>
+
+
+        <div class="settings-grid">
+
+
+            <div class="setting">
+
+                <div class="setting-label">
+                    User Authentication
+                </div>
+
+                <div class="setting-value">
+                    JWT Authentication
+                </div>
+
+            </div>
+
+
+
+            <div class="setting">
+
+                <div class="setting-label">
+                    Access Control
+                </div>
+
+                <div class="setting-value">
+                    Role-Based Access Control
+                </div>
+
+            </div>
+
+
+
+            <div class="setting">
+
+                <div class="setting-label">
+                    Administrator Access
+                </div>
+
+                <div class="setting-value">
+                    Enabled
+                </div>
+
+            </div>
+
+
+
+            <div class="setting">
+
+                <div class="setting-label">
+                    Database Connection
+                </div>
+
+                <div class="setting-value">
+
+                    <span class="status">
+                        Connected
+                    </span>
+
+                </div>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+
+
+    <!-- SESSION CONTROL -->
+
+    <div class="section danger-section">
+
+        <h2>
+            Session Control
+        </h2>
+
+
+        <p class="danger-text">
+
+            Sign out of the current administrator session.
+
+        </p>
+
+
+        <button
+            class="danger-btn"
+            onclick="logout()">
+
+            Logout
+
+        </button>
+
+    </div>
+
+
+</main>
+
+
+
+<script>
+
+
+    /*
+     * GET LOGGED-IN USER
+     */
+
+    const userData =
+        sessionStorage.getItem(
+            "pcrmsUser"
+        );
+
+
+    /*
+     * CHECK LOGIN
+     */
+
+    if (!userData) {
+
+        window.location.href =
+            "../index.html";
+
+    }
+
+
+    const user =
+        JSON.parse(userData);
+
+
+    /*
+     * CHECK ADMIN ROLE
+     */
+
+    if (user.role !== "ADMIN") {
+
+        alert(
+            "Access denied."
+        );
+
+        window.location.href =
+            "../index.html";
+
+    }
+
+
+    /*
+     * DISPLAY ADMIN DETAILS
+     */
+
+    document.getElementById(
+        "username"
+    ).textContent =
+        user.username || "-";
+
+
+    document.getElementById(
+        "fullName"
+    ).textContent =
+        user.fullName || "-";
+
+
+    document.getElementById(
+        "role"
+    ).textContent =
+        user.role || "-";
+
+
+    /*
+     * GO TO DASHBOARD
+     */
+
+    function goToDashboard() {
+
+        window.location.href =
+            "dashboard.html";
+
+    }
+
+
+    /*
+     * LOGOUT
+     */
+
+    function logout() {
+
+        sessionStorage.removeItem(
+            "pcrmsUser"
+        );
+
+
+        window.location.href =
+            "../index.html";
+
+    }
+
+
+</script>
+
+
+</body>
+
+</html>

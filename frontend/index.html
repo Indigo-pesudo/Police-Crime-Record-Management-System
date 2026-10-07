@@ -1,33 +1,494 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PCRMS Login</title>
+
+    <title>PCRMS | Login</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: #eef2f7;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #1f2937;
+        }
+
+        /* Main Login Wrapper */
+
+        .login-wrapper {
+            width: 900px;
+            max-width: 92%;
+            min-height: 520px;
+
+            background: white;
+
+            display: flex;
+
+            border-radius: 14px;
+
+            overflow: hidden;
+
+            box-shadow:
+                0 10px 35px rgba(0, 0, 0, 0.12);
+        }
+
+
+        /* Left Section */
+
+        .welcome-section {
+            width: 48%;
+
+            background: #0f2041;
+
+            color: white;
+
+            padding: 55px 45px;
+
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .logo {
+            width: 75px;
+            height: 75px;
+
+            border: 2px solid rgba(255,255,255,0.7);
+
+            border-radius: 50%;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            font-size: 30px;
+
+            margin-bottom: 25px;
+        }
+
+        .welcome-section h1 {
+            font-size: 30px;
+            margin-bottom: 15px;
+        }
+
+        .welcome-section h2 {
+            font-size: 17px;
+            font-weight: normal;
+
+            margin-bottom: 20px;
+
+            color: #dbe4f5;
+        }
+
+        .welcome-section p {
+            font-size: 14px;
+            line-height: 1.7;
+
+            color: #c5d0e3;
+
+            max-width: 340px;
+        }
+
+        .system-info {
+            margin-top: 35px;
+
+            padding-top: 20px;
+
+            border-top: 1px solid rgba(255,255,255,0.2);
+
+            font-size: 13px;
+
+            color: #b8c5da;
+        }
+
+
+        /* Right Login Section */
+
+        .login-section {
+            width: 52%;
+
+            padding: 55px 55px;
+
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .login-section h2 {
+            color: #0f2041;
+
+            font-size: 27px;
+
+            margin-bottom: 8px;
+        }
+
+        .login-subtitle {
+            color: #6b7280;
+
+            font-size: 14px;
+
+            margin-bottom: 32px;
+        }
+
+
+        /* Form */
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+
+            font-size: 14px;
+
+            font-weight: bold;
+
+            margin-bottom: 8px;
+
+            color: #374151;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-wrapper input {
+            width: 100%;
+
+            padding: 13px 14px;
+
+            border: 1px solid #d1d5db;
+
+            border-radius: 7px;
+
+            font-size: 15px;
+
+            outline: none;
+
+            transition: border 0.2s, box-shadow 0.2s;
+        }
+
+        .input-wrapper input:focus {
+            border-color: #0f2041;
+
+            box-shadow:
+                0 0 0 3px rgba(15,32,65,0.10);
+        }
+
+
+        /* Password Toggle */
+
+        .password-toggle {
+            position: absolute;
+
+            right: 12px;
+            top: 50%;
+
+            transform: translateY(-50%);
+
+            background: none;
+
+            border: none;
+
+            color: #6b7280;
+
+            cursor: pointer;
+
+            font-size: 13px;
+        }
+
+
+        /* Login Button */
+
+        .login-btn {
+            width: 100%;
+
+            padding: 13px;
+
+            margin-top: 8px;
+
+            background: #0f2041;
+
+            color: white;
+
+            border: none;
+
+            border-radius: 7px;
+
+            font-size: 15px;
+
+            font-weight: bold;
+
+            cursor: pointer;
+
+            transition: background 0.2s;
+        }
+
+        .login-btn:hover {
+            background: #1c376d;
+        }
+
+        .login-btn:active {
+            transform: translateY(1px);
+        }
+
+
+        /* Error Message */
+
+        #errorMessage {
+            margin-top: 18px;
+
+            padding: 10px;
+
+            border-radius: 6px;
+
+            font-size: 14px;
+
+            text-align: center;
+
+            color: #b00020;
+
+            background: #fff1f2;
+
+            display: none;
+        }
+
+
+        /* Footer */
+
+        .footer {
+            margin-top: 30px;
+
+            text-align: center;
+
+            font-size: 12px;
+
+            color: #9ca3af;
+        }
+
+
+        /* Responsive */
+
+        @media (max-width: 700px) {
+
+            .login-wrapper {
+                flex-direction: column;
+            }
+
+            .welcome-section {
+                width: 100%;
+
+                padding: 35px;
+            }
+
+            .login-section {
+                width: 100%;
+
+                padding: 35px;
+            }
+
+            .welcome-section p,
+            .system-info {
+                display: none;
+            }
+
+            .welcome-section h1 {
+                font-size: 25px;
+            }
+
+        }
+
+    </style>
+
 </head>
+
+
 <body>
 
-    <h1>PCRMS Login</h1>
 
-    <form id="loginForm">
+<div class="login-wrapper">
 
-        <label for="username">Username</label>
-        <input type="text" id="username" required>
 
-        <br><br>
+    <!-- ========================= -->
+    <!-- LEFT WELCOME SECTION -->
+    <!-- ========================= -->
 
-        <label for="password">Password</label>
-        <input type="password" id="password" required>
+    <section class="welcome-section">
 
-        <br><br>
+        <div class="logo">
+            ⚖
+        </div>
 
-        <button type="submit">Login</button>
+        <h1>
+            PCRMS
+        </h1>
 
-        <p id="errorMessage"></p>
+        <h2>
+            Police Crime Record Management System
+        </h2>
 
-    </form>
+        <p>
+            A centralized system for managing First Information
+            Reports, criminal records, cases, evidence and
+            investigation-related information.
+        </p>
 
-    <script src="js/login.js"></script>
+        <div class="system-info">
+
+           
+            Kindly use your assigned credentials to access the system.
+
+        </div>
+
+    </section>
+
+
+    <!-- ========================= -->
+    <!-- LOGIN SECTION -->
+    <!-- ========================= -->
+
+    <section class="login-section">
+
+        <h2>
+            Welcome Back
+        </h2>
+
+        <p class="login-subtitle">
+            Sign in to access your PCRMS dashboard.
+        </p>
+
+
+        <form id="loginForm">
+
+
+            <div class="form-group">
+
+                <label for="username">
+                    Username
+                </label>
+
+                <div class="input-wrapper">
+
+                    <input
+                        type="text"
+                        id="username"
+                        placeholder="Enter your username"
+                        autocomplete="username"
+                        required
+                    >
+
+                </div>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="password">
+                    Password
+                </label>
+
+                <div class="input-wrapper">
+
+                    <input
+                        type="password"
+                        id="password"
+                        placeholder="Enter your password"
+                        autocomplete="current-password"
+                        required
+                    >
+
+                    <button
+                        type="button"
+                        class="password-toggle"
+                        onclick="togglePassword()"
+                        id="toggleButton"
+                    >
+                        Show
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <button
+                type="submit"
+                class="login-btn"
+            >
+                Sign In
+            </button>
+
+
+            <p id="errorMessage"></p>
+
+
+        </form>
+
+
+        <div class="footer">
+
+            Police Crime Record Management System<br>
+
+            Authorized Access Only
+
+        </div>
+
+
+    </section>
+
+
+</div>
+
+
+<!-- Keep your existing login JavaScript -->
+
+<script src="js/login.js"></script>
+
+
+<script>
+
+    function togglePassword() {
+
+        const password =
+            document.getElementById("password");
+
+        const button =
+            document.getElementById("toggleButton");
+
+
+        if (password.type === "password") {
+
+            password.type = "text";
+
+            button.textContent = "Hide";
+
+        } else {
+
+            password.type = "password";
+
+            button.textContent = "Show";
+
+        }
+
+    }
+
+</script>
+
 
 </body>
+
 </html>

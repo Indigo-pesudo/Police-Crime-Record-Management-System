@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>PCRMS - Case Details</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f4f6f9;
+            color: #1f2937;
+        }
+
+        .header {
+            height: 70px;
+            background: #0f2041;
+            color: white;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            padding: 0 30px;
+        }
+
+        .back-btn {
+            background: #1c376d;
+            color: white;
+            text-decoration: none;
+            padding: 10px 16px;
+            border-radius: 6px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .card h1 {
+            color: #0f2041;
+            margin-bottom: 25px;
+        }
+
+        .details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .field {
+            border-bottom: 1px solid #e5e7eb;
+            padding-bottom: 15px;
+        }
+
+        .full {
+            grid-column: 1 / -1;
+        }
+
+        .label {
+            color: #6b7280;
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 7px;
+        }
+
+        .value {
+            font-size: 16px;
+        }
+
+        .status {
+            display: inline-block;
+            background: #e8f5e9;
+            color: #2e7d32;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+
+        #loading {
+            text-align: center;
+            color: #666;
+            padding: 30px;
+        }
+
+        #error {
+            display: none;
+            background: #ffebee;
+            color: #c62828;
+            padding: 15px;
+            border-radius: 6px;
+        }
+
+        @media (max-width: 700px) {
+
+            .details {
+                grid-template-columns: 1fr;
+            }
+
+            .full {
+                grid-column: auto;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<header class="header">
+
+    <h2>PCRMS | Case Details</h2>
+
+    <a href="case-management.html"
+       class="back-btn">
+        ← Back to Cases
+    </a>
+
+</header>
+
+
+<main class="container">
+
+    <div id="loading">
+        Loading case details...
+    </div>
+
+    <div id="error"></div>
+
+
+    <div class="card"
+         id="caseCard"
+         style="display:none;">
+
+        <h1>Case Details</h1>
+
+        <div class="details">
+
+            <div class="field">
+
+                <div class="label">
+                    Case Number
+                </div>
+
+                <div class="value"
+                     id="caseNumber">
+                </div>
+
+            </div>
+
+
+            <div class="field">
+
+                <div class="label">
+                    FIR Number
+                </div>
+
+                <div class="value"
+                     id="firNumber">
+                </div>
+
+            </div>
+
+
+            <div class="field">
+
+                <div class="label">
+                    Case Title
+                </div>
+
+                <div class="value"
+                     id="title">
+                </div>
+
+            </div>
+
+
+            <div class="field">
+
+                <div class="label">
+                    Investigating Officer
+                </div>
+
+                <div class="value"
+                     id="investigatingOfficer">
+                </div>
+
+            </div>
+
+
+            <div class="field">
+
+                <div class="label">
+                    Opened Date
+                </div>
+
+                <div class="value"
+                     id="openedDate">
+                </div>
+
+            </div>
+
+
+            <div class="field">
+
+                <div class="label">
+                    Status
+                </div>
+
+                <div class="value">
+
+                    <span class="status"
+                          id="status">
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <div class="field full">
+
+                <div class="label">
+                    Description
+                </div>
+
+                <div class="value"
+                     id="description">
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</main>
+
+
+<script>
+
+const userData =
+    sessionStorage.getItem("pcrmsUser");
+
+
+if (!userData) {
+
+    window.location.href =
+        "../index.html";
+
+}
+
+
+const user =
+    JSON.parse(userData);
+
+
+if (user.role !== "INSPECTOR") {
+
+    alert("Access denied.");
+
+    window.location.href =
+        "../index.html";
+
+}
+
+
+const params =
+    new URLSearchParams(
+        window.location.search
+    );
+
+
+const caseId =
+    params.get("id");
+
+
+const loading =
+    document.getElementById("loading");
+
+
+const error =
+    document.getElementById("error");
+
+
+const caseCard =
+    document.getElementById("caseCard");
+
+
+if (!caseId) {
+
+    loading.style.display = "none";
+
+    error.style.display = "block";
+
+    error.textContent =
+        "Case ID is missing.";
+
+} else {
+
+    fetch(
+        `http://localhost:8080/api/cases/${caseId}`,
+        {
+
+            method: "GET",
+
+            headers: {
+
+                "Authorization":
+                    "Bearer " + user.token
+
+            }
+
+        }
+    )
+
+    .then(response => {
+
+        console.log(
+            "Response status:",
+            response.status
+        );
+
+
+        if (response.status === 401) {
+
+            throw new Error(
+                "Session expired. Please login again."
+            );
+
+        }
+
+
+        if (response.status === 403) {
+
+            throw new Error(
+                "You do not have permission to view this case."
+            );
+
+        }
+
+
+        if (response.status === 404) {
+
+            throw new Error(
+                "Case not found."
+            );
+
+        }
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                "Unable to load case details."
+            );
+
+        }
+
+
+        return response.json();
+
+    })
+
+    .then(caseData => {
+
+        console.log(
+            "Case data:",
+            caseData
+        );
+
+
+        document.getElementById(
+            "caseNumber"
+        ).textContent =
+            caseData.caseNumber || "-";
+
+
+        document.getElementById(
+            "firNumber"
+        ).textContent =
+            caseData.firNumber || "-";
+
+
+        document.getElementById(
+            "title"
+        ).textContent =
+            caseData.title || "-";
+
+
+        document.getElementById(
+            "investigatingOfficer"
+        ).textContent =
+            caseData.investigatingOfficer || "-";
+
+
+        document.getElementById(
+            "openedDate"
+        ).textContent =
+            caseData.openedDate || "-";
+
+
+        document.getElementById(
+            "status"
+        ).textContent =
+            caseData.status || "-";
+
+
+        document.getElementById(
+            "description"
+        ).textContent =
+            caseData.description || "-";
+
+
+        loading.style.display =
+            "none";
+
+        caseCard.style.display =
+            "block";
+
+    })
+
+    .catch(err => {
+
+        console.error(
+            "Error loading case:",
+            err
+        );
+
+
+        loading.style.display =
+            "none";
+
+        error.style.display =
+            "block";
+
+        error.textContent =
+            err.message ||
+            "Unable to load case details.";
+
+    });
+
+}
+
+</script>
+
+</body>
+
+</html>

@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evidence Management - PCRMS</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f6f9;
+        }
+
+        .container {
+            width: 92%;
+            max-width: 1200px;
+            margin: 30px auto;
+        }
+
+        .back {
+            text-decoration: none;
+            color: #0f2041;
+            font-weight: bold;
+        }
+
+        h1,
+        h2 {
+            color: #0f2041;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            margin-top: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        input,
+        select,
+        textarea,
+        button {
+            padding: 11px;
+            border-radius: 6px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+
+        input,
+        select,
+        textarea {
+            border: 1px solid #ccc;
+            width: 100%;
+        }
+
+        textarea {
+            margin-top: 15px;
+            resize: vertical;
+        }
+
+        button {
+            background: #0f2041;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        .row {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .row input,
+        .row select {
+            flex: 1;
+            min-width: 200px;
+            width: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th,
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+            text-align: left;
+        }
+
+        th {
+            background: #0f2041;
+            color: white;
+        }
+
+        .message {
+            margin-top: 12px;
+            font-weight: bold;
+        }
+
+        .empty {
+            text-align: center;
+            padding: 20px;
+            color: #777;
+        }
+
+        @media (max-width: 700px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            table {
+                display: block;
+                overflow-x: auto;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <a href="dashboard.html" class="back">
+        ← Back to Dashboard
+    </a>
+
+    <h1>Evidence Management</h1>
+
+    <!-- ADD EVIDENCE -->
+    <div class="card">
+
+        <h2>Add Evidence</h2>
+
+        <div class="form-grid">
+
+            <input
+                id="evidenceNumber"
+                placeholder="Evidence Number"
+            >
+
+            <input
+                id="firNumber"
+                placeholder="FIR Number"
+            >
+
+            <input
+                id="caseNumber"
+                placeholder="Case Number"
+            >
+
+            <input
+                id="evidenceType"
+                placeholder="Evidence Type"
+            >
+
+            <input
+                id="collectedBy"
+                placeholder="Collected By"
+            >
+
+            <input
+                id="collectedDate"
+                type="date"
+            >
+
+            <input
+                id="storageLocation"
+                placeholder="Storage Location"
+            >
+
+            <select id="status">
+                <option value="IN_STORAGE">IN STORAGE</option>
+                <option value="AT_SCENE">AT SCENE</option>
+                <option value="SENT_TO_LAB">SENT TO LAB</option>
+                <option value="RETURNED">RETURNED</option>
+                <option value="RELEASED">RELEASED</option>
+            </select>
+
+        </div>
+
+        <textarea
+            id="description"
+            rows="4"
+            placeholder="Evidence Description"
+        ></textarea>
+
+        <br><br>
+
+        <button onclick="createEvidence()">
+            Add Evidence
+        </button>
+
+        <div id="createMessage" class="message"></div>
+
+    </div>
+
+
+    <!-- SEARCH -->
+    <div class="card">
+
+        <h2>Search Evidence</h2>
+
+        <div class="row">
+
+            <select id="searchType">
+                <option value="evidenceNumber">
+                    Evidence Number
+                </option>
+
+                <option value="firNumber">
+                    FIR Number
+                </option>
+
+                <option value="caseNumber">
+                    Case Number
+                </option>
+
+                <option value="status">
+                    Status
+                </option>
+
+                <option value="evidenceType">
+                    Evidence Type
+                </option>
+            </select>
+
+            <input
+                id="searchValue"
+                placeholder="Enter search value"
+            >
+
+            <button onclick="searchEvidence()">
+                Search
+            </button>
+
+            <button onclick="loadAllEvidence()">
+                Show All
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- RESULTS -->
+    <div class="card">
+
+        <h2>Evidence Records</h2>
+
+        <div id="results">
+
+            <div class="empty">
+                Click "Show All" to load evidence records.
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+    const user =
+        JSON.parse(sessionStorage.getItem("pcrmsUser"));
+
+    if (!user || !user.token) {
+        window.location.href = "../index.html";
+    }
+
+    const API =
+        "http://localhost:8080/api/evidence";
+
+
+    // CREATE EVIDENCE
+    async function createEvidence() {
+
+        const evidence = {
+
+            evidenceNumber:
+                document.getElementById("evidenceNumber")
+                    .value.trim(),
+
+            firNumber:
+                document.getElementById("firNumber")
+                    .value.trim(),
+
+            caseNumber:
+                document.getElementById("caseNumber")
+                    .value.trim(),
+
+            evidenceType:
+                document.getElementById("evidenceType")
+                    .value.trim(),
+
+            description:
+                document.getElementById("description")
+                    .value.trim(),
+
+            collectedBy:
+                document.getElementById("collectedBy")
+                    .value.trim(),
+
+            collectedDate:
+                document.getElementById("collectedDate")
+                    .value,
+
+            storageLocation:
+                document.getElementById("storageLocation")
+                    .value.trim(),
+
+            status:
+                document.getElementById("status")
+                    .value
+        };
+
+
+        if (!evidence.evidenceNumber ||
+            !evidence.firNumber ||
+            !evidence.evidenceType ||
+            !evidence.collectedBy) {
+
+            document.getElementById("createMessage")
+                .textContent =
+                "Please fill Evidence Number, FIR Number, Evidence Type and Collected By.";
+
+            return;
+        }
+
+
+        try {
+
+            const response =
+                await fetch(API, {
+
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization":
+                            `Bearer ${user.token}`
+                    },
+
+                    body:
+                        JSON.stringify(evidence)
+                });
+
+
+            const data =
+                await response.json();
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    data.message ||
+                    "Unable to create evidence"
+                );
+            }
+
+
+            document.getElementById("createMessage")
+                .textContent =
+                "Evidence created successfully.";
+
+
+            clearForm();
+
+            loadAllEvidence();
+
+
+        } catch (error) {
+
+            document.getElementById("createMessage")
+                .textContent =
+                error.message;
+        }
+    }
+
+
+    // LOAD ALL
+    async function loadAllEvidence() {
+
+        try {
+
+            const response =
+                await fetch(API, {
+
+                    headers: {
+                        "Authorization":
+                            `Bearer ${user.token}`
+                    }
+                });
+
+
+            const data =
+                await response.json();
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    data.message ||
+                    "Unable to load evidence"
+                );
+            }
+
+
+            displayEvidence(data);
+
+
+        } catch (error) {
+
+            document.getElementById("results")
+                .innerHTML =
+                `<div class="empty">
+                    ${escapeHtml(error.message)}
+                </div>`;
+        }
+    }
+
+
+    // SEARCH
+    async function searchEvidence() {
+
+        const type =
+            document.getElementById("searchType")
+                .value;
+
+        const value =
+            document.getElementById("searchValue")
+                .value.trim();
+
+
+        if (!value) {
+
+            alert("Enter a search value.");
+
+            return;
+        }
+
+
+        try {
+
+            const response =
+                await fetch(
+                    `${API}/search?${encodeURIComponent(type)}=${encodeURIComponent(value)}`,
+                    {
+                        headers: {
+                            "Authorization":
+                                `Bearer ${user.token}`
+                        }
+                    }
+                );
+
+
+            const data =
+                await response.json();
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    data.message ||
+                    "Search failed"
+                );
+            }
+
+
+            displayEvidence(data);
+
+
+        } catch (error) {
+
+            document.getElementById("results")
+                .innerHTML =
+                `<div class="empty">
+                    ${escapeHtml(error.message)}
+                </div>`;
+        }
+    }
+
+
+    // DISPLAY
+    function displayEvidence(records) {
+
+        const container =
+            document.getElementById("results");
+
+
+        if (!records ||
+            records.length === 0) {
+
+            container.innerHTML =
+                `<div class="empty">
+                    No evidence records found.
+                </div>`;
+
+            return;
+        }
+
+
+        let html = `
+
+            <table>
+
+                <thead>
+
+                    <tr>
+                        <th>Evidence No.</th>
+                        <th>FIR</th>
+                        <th>Case</th>
+                        <th>Type</th>
+                        <th>Collected By</th>
+                        <th>Storage</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+
+                </thead>
+
+                <tbody>
+        `;
+
+
+        records.forEach(record => {
+
+            html += `
+
+                <tr>
+
+                    <td>
+                        ${escapeHtml(
+                            record.evidenceNumber ?? ""
+                        )}
+                    </td>
+
+                    <td>
+                        ${escapeHtml(
+                            record.firNumber ?? ""
+                        )}
+                    </td>
+
+                    <td>
+                        ${escapeHtml(
+                            record.caseNumber ?? ""
+                        )}
+                    </td>
+
+                    <td>
+                        ${escapeHtml(
+                            record.evidenceType ?? ""
+                        )}
+                    </td>
+
+                    <td>
+                        ${escapeHtml(
+                            record.collectedBy ?? ""
+                        )}
+                    </td>
+
+                    <td>
+                        ${escapeHtml(
+                            record.storageLocation ?? ""
+                        )}
+                    </td>
+
+                    <td>
+    ${escapeHtml(
+        record.status ?? ""
+    )}
+</td>
+
+<td>
+    <button onclick="showTransferForm(${record.id})">
+        Transfer
+    </button>
+
+    <button onclick="viewHistory(${record.id})">
+        History
+    </button>
+</td>
+
+</tr>
+            `;
+        });
+
+
+        html += `
+
+                </tbody>
+
+            </table>
+        `;
+
+
+        container.innerHTML = html;
+    }
+
+
+    // CLEAR FORM
+    function clearForm() {
+
+        document.getElementById("evidenceNumber").value = "";
+        document.getElementById("firNumber").value = "";
+        document.getElementById("caseNumber").value = "";
+        document.getElementById("evidenceType").value = "";
+        document.getElementById("collectedBy").value = "";
+        document.getElementById("collectedDate").value = "";
+        document.getElementById("storageLocation").value = "";
+        document.getElementById("description").value = "";
+        document.getElementById("status").value = "IN_STORAGE";
+    }
+
+
+    // ESCAPE HTML
+    function escapeHtml(value) {
+
+        return String(value)
+
+            .replaceAll("&", "&amp;")
+            .replaceAll("<", "&lt;")
+            .replaceAll(">", "&gt;")
+            .replaceAll('"', "&quot;")
+            .replaceAll("'", "&#039;");
+    }
+async function showTransferForm(id) {
+
+    const user = JSON.parse(sessionStorage.getItem("pcrmsUser"));
+
+    if (!user || !user.token) {
+        window.location.href = "../index.html";
+        return;
+    }
+
+    const toLocation = prompt("Enter destination location:");
+
+    if (!toLocation || !toLocation.trim()) {
+        return;
+    }
+
+    const newCustodian = prompt("Enter new custodian:");
+
+    if (!newCustodian || !newCustodian.trim()) {
+        return;
+    }
+
+    const remarks = prompt("Enter transfer remarks (optional):");
+
+    try {
+
+        const response = await fetch(
+            `${API}/${id}/transfer`,
+            {
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${user.token}`
+                },
+
+                body: JSON.stringify({
+                    toLocation: toLocation.trim(),
+                    newCustodian: newCustodian.trim(),
+                    remarks: remarks ? remarks.trim() : ""
+                })
+            }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(
+                data.message || "Transfer failed"
+            );
+        }
+
+        alert("Evidence transferred successfully.");
+
+        loadAllEvidence();
+
+    } catch (error) {
+
+        alert(error.message);
+    }
+}
+
+
+async function viewHistory(id) {
+
+    const user = JSON.parse(sessionStorage.getItem("pcrmsUser"));
+
+    if (!user || !user.token) {
+        window.location.href = "../index.html";
+        return;
+    }
+
+    try {
+
+        const response = await fetch(
+            `${API}/${id}/history`,
+            {
+                headers: {
+                    "Authorization": `Bearer ${user.token}`
+                }
+            }
+        );
+
+        const history = await response.json();
+
+        if (!response.ok) {
+            alert("Unable to load evidence history.");
+            return;
+        }
+
+        if (history.length === 0) {
+            alert("No transfer history available for this evidence.");
+            return;
+        }
+
+        let message = "Evidence Chain of Custody\n\n";
+
+        history.forEach((record, index) => {
+
+            message +=
+                `${index + 1}. ${record.action}\n` +
+                `From: ${record.fromLocation || "N/A"}\n` +
+                `To: ${record.toLocation || "N/A"}\n` +
+                `Previous Custodian: ${record.previousCustodian || "N/A"}\n` +
+                `New Custodian: ${record.newCustodian || "N/A"}\n` +
+                `Transferred By: ${record.transferredBy || "N/A"}\n` +
+                `Time: ${record.timestamp || "N/A"}\n` +
+                `Remarks: ${record.remarks || "None"}\n\n`;
+        });
+
+        alert(message);
+
+    } catch (error) {
+
+        console.error("History error:", error);
+        alert("Unable to connect to the server.");
+    }
+}
+</script>
+
+</body>
+</html>

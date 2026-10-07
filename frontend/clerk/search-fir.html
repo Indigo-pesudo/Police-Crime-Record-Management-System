@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <title>Search FIR - PCRMS</title>
+
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background: #0f2041;
+            color: white;
+            min-height: 100vh;
+        }
+
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 40px auto;
+        }
+
+
+        .back {
+            display: inline-block;
+            margin-bottom: 20px;
+            text-decoration: none;
+            color: #b9c7df;
+            font-weight: bold;
+        }
+
+
+        .back:hover {
+            color: white;
+        }
+
+
+        h1 {
+            margin-bottom: 25px;
+        }
+
+
+        .search-box {
+            background: #172b50;
+            padding: 25px;
+            border-radius: 10px;
+            border: 1px solid #2d4774;
+        }
+
+
+        .row {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+
+        select,
+        input,
+        button {
+            padding: 12px;
+            font-size: 15px;
+            border-radius: 6px;
+        }
+
+
+        select,
+        input {
+            border: 1px solid #52698f;
+            background: white;
+            color: #111;
+        }
+
+
+        select {
+            min-width: 180px;
+        }
+
+
+        input {
+            flex: 1;
+            min-width: 250px;
+        }
+
+
+        button {
+            background: #ffffff;
+            color: #0f2041;
+            cursor: pointer;
+            border: none;
+            font-weight: bold;
+        }
+
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+
+        .search-button {
+            background: #ffffff;
+            color: #0f2041;
+        }
+
+
+        .message {
+            margin-top: 15px;
+            font-weight: bold;
+            color: #ffcccb;
+        }
+
+
+        .results {
+            margin-top: 30px;
+            background: #172b50;
+            padding: 25px;
+            border-radius: 10px;
+            border: 1px solid #2d4774;
+        }
+
+
+        .results h2 {
+            margin-bottom: 20px;
+        }
+
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+
+        th,
+        td {
+            padding: 14px;
+            border-bottom: 1px solid #2d4774;
+            text-align: left;
+        }
+
+
+        th {
+            background: #09162f;
+            color: #b9c7df;
+        }
+
+
+        tr:hover {
+            background: #1d3560;
+        }
+
+
+        .fir-link {
+            background: transparent;
+            color: #8db8ff;
+            padding: 0;
+            font-size: 15px;
+            font-weight: bold;
+        }
+
+
+        .fir-link:hover {
+            text-decoration: underline;
+        }
+
+
+        .status {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+
+        .status-open {
+            background: #1f7a4d;
+            color: white;
+        }
+
+
+        .status-closed {
+            background: #6b7280;
+            color: white;
+        }
+
+
+        .empty {
+            text-align: center;
+            padding: 25px;
+            color: #b9c7df;
+        }
+
+
+        .loading {
+            text-align: center;
+            padding: 25px;
+            color: #b9c7df;
+        }
+
+
+        @media (max-width: 800px) {
+
+            .container {
+                width: 95%;
+                margin: 25px auto;
+            }
+
+            .row {
+                flex-direction: column;
+            }
+
+            select,
+            input,
+            .search-button {
+                width: 100%;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<div class="container">
+
+
+    <!-- BACK BUTTON -->
+
+    <a
+        href="dashboard.html"
+        class="back">
+
+        ← Back to Dashboard
+
+    </a>
+
+
+    <!-- TITLE -->
+
+    <h1>
+        Search FIR
+    </h1>
+
+
+    <!-- SEARCH BOX -->
+
+    <div class="search-box">
+
+        <div class="row">
+
+
+            <!-- SEARCH TYPE -->
+
+            <select id="searchType">
+
+                <option value="firNumber">
+                    FIR Number
+                </option>
+
+                <option value="complainantName">
+                    Complainant
+                </option>
+
+                <option value="location">
+                    Location
+                </option>
+
+                <option value="status">
+                    Status
+                </option>
+
+            </select>
+
+
+            <!-- SEARCH VALUE -->
+
+            <input
+                type="text"
+                id="searchValue"
+                placeholder="Enter search value">
+
+
+            <!-- SEARCH BUTTON -->
+
+            <button
+                class="search-button"
+                onclick="searchFIRs()">
+
+                Search
+
+            </button>
+
+        </div>
+
+
+        <div
+            id="message"
+            class="message">
+        </div>
+
+    </div>
+
+
+    <!-- RESULTS -->
+
+    <div class="results">
+
+        <h2>
+            Search Results
+        </h2>
+
+
+        <div id="resultsContainer">
+
+            <div class="empty">
+
+                Enter a search value and click Search.
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+</div>
+
+
+<script>
+
+
+    /*
+     * API BASE URL
+     */
+
+    const API_BASE =
+        "http://localhost:8080";
+
+
+    /*
+     * GET LOGGED-IN USER
+     */
+
+    const user =
+        JSON.parse(
+            sessionStorage.getItem("pcrmsUser")
+        );
+
+
+    /*
+     * CHECK LOGIN
+     */
+
+    if (!user || !user.token) {
+
+        window.location.href =
+            "../index.html";
+
+    }
+
+
+    /*
+     * SEARCH FIRs
+     */
+
+    async function searchFIRs() {
+
+
+        const type =
+            document.getElementById(
+                "searchType"
+            ).value;
+
+
+        const value =
+            document.getElementById(
+                "searchValue"
+            ).value.trim();
+
+
+        const message =
+            document.getElementById(
+                "message"
+            );
+
+
+        const resultsContainer =
+            document.getElementById(
+                "resultsContainer"
+            );
+
+
+        /*
+         * CLEAR OLD MESSAGE
+         */
+
+        message.textContent = "";
+
+
+        /*
+         * VALIDATE INPUT
+         */
+
+        if (!value) {
+
+            message.textContent =
+                "Please enter a search value.";
+
+            return;
+
+        }
+
+
+        /*
+         * SHOW LOADING
+         */
+
+        resultsContainer.innerHTML =
+
+            `<div class="loading">
+                Searching FIR records...
+            </div>`;
+
+
+        try {
+
+
+            /*
+             * BUILD SEARCH URL
+             */
+
+            const url =
+                API_BASE +
+                "/api/firs/search?" +
+                encodeURIComponent(type) +
+                "=" +
+                encodeURIComponent(value);
+
+
+            console.log(
+                "Searching:",
+                url
+            );
+
+
+            /*
+             * SEND REQUEST
+             */
+
+            const response =
+                await fetch(
+                    url,
+                    {
+                        method: "GET",
+
+                        headers: {
+
+                            "Authorization":
+                                "Bearer " +
+                                user.token
+
+                        }
+
+                    }
+                );
+
+
+            /*
+             * READ RESPONSE
+             */
+
+            const data =
+                await response.json();
+
+
+            /*
+             * CHECK HTTP STATUS
+             */
+
+            if (!response.ok) {
+
+                throw new Error(
+                    data.message ||
+                    "Search failed. HTTP " +
+                    response.status
+                );
+
+            }
+
+
+            /*
+             * DISPLAY RESULTS
+             */
+
+            displayResults(data);
+
+
+        }
+        catch (error) {
+
+            console.error(
+                "FIR search error:",
+                error
+            );
+
+
+            resultsContainer.innerHTML =
+
+                `<div class="empty">
+
+                    ${escapeHtml(
+                        error.message
+                    )}
+
+                </div>`;
+
+        }
+
+    }
+
+
+    /*
+     * DISPLAY SEARCH RESULTS
+     */
+
+    function displayResults(firs) {
+
+
+        const container =
+            document.getElementById(
+                "resultsContainer"
+            );
+
+
+        /*
+         * NO RESULTS
+         */
+
+        if (
+            !Array.isArray(firs) ||
+            firs.length === 0
+        ) {
+
+            container.innerHTML =
+
+                `<div class="empty">
+
+                    No FIR records found.
+
+                </div>`;
+
+            return;
+
+        }
+
+
+        /*
+         * CREATE TABLE
+         */
+
+        let html = `
+
+            <div class="table-container">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                FIR Number
+                            </th>
+
+                            <th>
+                                Complainant
+                            </th>
+
+                            <th>
+                                Date
+                            </th>
+
+                            <th>
+                                Location
+                            </th>
+
+                            <th>
+                                Status
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+        `;
+
+
+        /*
+         * ADD EACH FIR
+         */
+
+        firs.forEach(
+            fir => {
+
+
+                const status =
+                    String(
+                        fir.status || ""
+                    ).toUpperCase();
+
+
+                const statusClass =
+                    status === "OPEN"
+                        ? "status-open"
+                        : "status-closed";
+
+
+                html += `
+
+                    <tr>
+
+
+                        <td>
+
+                            <button
+                                class="fir-link"
+                                onclick="viewFIR(${Number(fir.id)})">
+
+                                ${escapeHtml(
+                                    fir.firNumber
+                                )}
+
+                            </button>
+
+                        </td>
+
+
+                        <td>
+
+                            ${escapeHtml(
+                                fir.complainantName
+                            )}
+
+                        </td>
+
+
+                        <td>
+
+                            ${escapeHtml(
+                                fir.date
+                            )}
+
+                        </td>
+
+
+                        <td>
+
+                            ${escapeHtml(
+                                fir.incidentLocation
+                            )}
+
+                        </td>
+
+
+                        <td>
+
+                            <span
+                                class="status ${statusClass}">
+
+                                ${escapeHtml(
+                                    status
+                                )}
+
+                            </span>
+
+                        </td>
+
+
+                    </tr>
+
+                `;
+
+            }
+        );
+
+
+        /*
+         * CLOSE TABLE
+         */
+
+        html += `
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        `;
+
+
+        /*
+         * PUT TABLE ON PAGE
+         */
+
+        container.innerHTML =
+            html;
+
+    }
+
+
+    /*
+     * ESCAPE HTML
+     */
+
+    function escapeHtml(value) {
+
+
+        if (
+            value === null ||
+            value === undefined
+        ) {
+
+            return "";
+
+        }
+
+
+        return String(value)
+
+            .replaceAll(
+                "&",
+                "&amp;"
+            )
+
+            .replaceAll(
+                "<",
+                "&lt;"
+            )
+
+            .replaceAll(
+                ">",
+                "&gt;"
+            )
+
+            .replaceAll(
+                '"',
+                "&quot;"
+            )
+
+            .replaceAll(
+                "'",
+                "&#039;"
+            );
+
+    }
+
+
+    /*
+     * VIEW FIR DETAILS
+     */
+
+    function viewFIR(id) {
+
+        window.location.href =
+            `fir-details.html?id=${encodeURIComponent(id)}`;
+
+    }
+
+
+    /*
+     * ALLOW ENTER KEY TO SEARCH
+     */
+
+    document
+        .getElementById("searchValue")
+        .addEventListener(
+            "keydown",
+            function(event) {
+
+                if (
+                    event.key === "Enter"
+                ) {
+
+                    searchFIRs();
+
+                }
+
+            }
+        );
+
+
+</script>
+
+
+</body>
+
+</html>

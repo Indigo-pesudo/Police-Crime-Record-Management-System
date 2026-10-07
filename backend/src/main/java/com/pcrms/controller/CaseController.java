@@ -51,6 +51,15 @@ public class CaseController {
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
+    @GetMapping("/fir/{firNumber}")
+public ResponseEntity<List<Case>> getCasesByFirNumber(
+        @PathVariable String firNumber) {
+
+    List<Case> cases =
+            caseRepository.findByFirNumber(firNumber);
+
+    return ResponseEntity.ok(cases);
+}
     @GetMapping("/stats")
 public long getActiveCases() {
     return caseRepository.countByStatus("OPEN");

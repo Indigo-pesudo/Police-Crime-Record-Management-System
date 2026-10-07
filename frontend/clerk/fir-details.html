@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FIR Details - PCRMS</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background: #f4f6f9;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1000px;
+            margin: 40px auto;
+        }
+
+        .back {
+            text-decoration: none;
+            color: #0f2041;
+        }
+
+        .card {
+            background: white;
+            margin-top: 25px;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        h1 {
+            color: #0f2041;
+        }
+
+        .field {
+            margin-bottom: 20px;
+        }
+
+        .label {
+            font-weight: bold;
+            color: #555;
+            margin-bottom: 5px;
+        }
+
+        .value {
+            padding: 10px;
+            background: #f7f7f7;
+            border-radius: 5px;
+        }
+
+        .error {
+            color: #b00020;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <a href="search-fir.html" class="back">
+        ← Back to Search
+    </a>
+
+    <div class="card">
+
+        <h1>FIR Details</h1>
+
+        <div id="content">
+            Loading...
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+    const user = JSON.parse(sessionStorage.getItem("pcrmsUser"));
+
+    if (!user || !user.token) {
+        window.location.href = "../index.html";
+    }
+
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get("id");
+
+    async function loadFIR() {
+
+        if (!id) {
+            document.getElementById("content").innerHTML =
+                '<p class="error">Invalid FIR ID.</p>';
+            return;
+        }
+
+        try {
+
+            const response = await fetch(
+                `http://localhost:8080/api/firs/${id}`,
+                {
+                    method: "GET",
+                    headers: {
+                        "Authorization": `Bearer ${user.token}`
+                    }
+                }
+            );
+
+            const fir = await response.json();
+
+            if (!response.ok) {
+                throw new Error(
+                    fir.message || "Unable to load FIR"
+                );
+            }
+
+            document.getElementById("content").innerHTML = `
+
+                <div class="field">
+                    <div class="label">FIR Number</div>
+                    <div class="value">
+                        ${escapeHtml(fir.firNumber ?? "")}
+                    </div>
+                </div>
+
+                <div class="field">
+                    <div class="label">Date</div>
+                    <div class="value">
+                        ${escapeHtml(fir.date ?? "")}
+                    </div>
+                </div>
+
+                <div class="field">
+                    <div class="label">Complainant Name</div>
+                    <div class="value">
+                        ${escapeHtml(fir.complainantName ?? "")}
+                    </div>
+                </div>
+
+                <div class="field">
+                    <div class="label">Complainant Contact</div>
+                    <div class="value">
+                        ${escapeHtml(fir.complainantContact ?? "")}
+                    </div>
+                </div>
+
+                <div class="field">
+                    <div class="label">Incident Location</div>
+                    <div class="value">
+                        ${escapeHtml(fir.incidentLocation ?? "")}
+                    </div>
+                </div>
+
+                <div class="field">
+                    <div class="label">Description</div>
+                    <div class="value">
+                        ${escapeHtml(fir.description ?? "")}
+                    </div>
+                </div>
+
+                <div class="field">
+                    <div class="label">Status</div>
+                    <div class="value">
+                        ${escapeHtml(fir.status ?? "")}
+                    </div>
+                </div>
+            `;
+
+        } catch (error) {
+
+            document.getElementById("content").innerHTML =
+                `<p class="error">${escapeHtml(error.message)}</p>`;
+        }
+    }
+
+    function escapeHtml(value) {
+
+        return String(value)
+            .replaceAll("&", "&amp;")
+            .replaceAll("<", "&lt;")
+            .replaceAll(">", "&gt;")
+            .replaceAll('"', "&quot;")
+            .replaceAll("'", "&#039;");
+    }
+
+    loadFIR();
+
+</script>
+
+</body>
+</html>

@@ -238,6 +238,7 @@
                     <th>Officer</th>
                     <th>Date</th>
                     <th>Status</th>
+                    <th>Action</th>
 
                 </tr>
 
@@ -246,7 +247,7 @@
             <tbody id="caseTable">
 
                 <tr>
-                    <td colspan="6">
+                    <td colspan="7">
                         Loading...
                     </td>
                 </tr>
@@ -436,7 +437,7 @@ async function loadCases() {
 
             table.innerHTML = `
                 <tr>
-                    <td colspan="6">
+                    <td colspan="7">
                         No cases available.
                     </td>
                 </tr>
@@ -473,8 +474,23 @@ async function loadCases() {
                     </td>
 
                     <td>
-                        ${caseData.status}
-                    </td>
+    ${caseData.status}
+</td>
+
+<td>
+    <a
+        href="case-details.html?id=${caseData.id}"
+        style="
+            background:#0f2041;
+            color:white;
+            padding:8px 12px;
+            border-radius:5px;
+            text-decoration:none;
+            display:inline-block;
+        ">
+        View Details
+    </a>
+</td>
 
                 </tr>
 

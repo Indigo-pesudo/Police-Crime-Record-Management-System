@@ -1,0 +1,1033 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>PCRMS - Reports</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #0f2041;
+            color: white;
+            min-height: 100vh;
+        }
+
+        header {
+            background: #09162f;
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #263d68;
+        }
+
+        header h1 {
+            font-size: 24px;
+        }
+
+        .header-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        button {
+            border: none;
+            border-radius: 6px;
+            padding: 10px 16px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .dashboard-btn {
+            background: white;
+            color: #0f2041;
+        }
+
+        .logout-btn {
+            background: #d9534f;
+            color: white;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: auto;
+            padding: 30px;
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section h2 {
+            margin-bottom: 20px;
+        }
+
+        /* SUMMARY CARDS */
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .card {
+            background: #172b50;
+            border: 1px solid #2d4774;
+            border-radius: 10px;
+            padding: 25px;
+            text-align: center;
+        }
+
+        .card h3 {
+            color: #b9c7df;
+            font-size: 16px;
+            margin-bottom: 15px;
+        }
+
+        .number {
+            font-size: 32px;
+            font-weight: bold;
+        }
+
+        /* TABLE */
+
+        .table-container {
+            background: #172b50;
+            border: 1px solid #2d4774;
+            border-radius: 10px;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            padding: 14px;
+            text-align: left;
+            border-bottom: 1px solid #2d4774;
+        }
+
+        th {
+            background: #09162f;
+            color: #b9c7df;
+        }
+
+        tr:hover {
+            background: #1d3560;
+        }
+
+        /* STATUS */
+
+        .status {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .status-open,
+        .status-active {
+            background: #1f7a4d;
+            color: white;
+        }
+
+        .status-closed,
+        .status-inactive {
+            background: #6b7280;
+            color: white;
+        }
+
+        /* LOADING / EMPTY */
+
+        .loading,
+        .empty {
+            text-align: center;
+            padding: 25px;
+            color: #b9c7df;
+        }
+
+        /* ERROR */
+
+        .error {
+            display: none;
+            background: #5c1f24;
+            border: 1px solid #a33a42;
+            color: #ffd7d9;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+
+        /* RESPONSIVE */
+
+        @media (max-width: 800px) {
+
+            .cards {
+                grid-template-columns: 1fr;
+            }
+
+            header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+
+            .container {
+                padding: 20px;
+            }
+        }
+    </style>
+
+</head>
+
+
+<body>
+
+    <!-- HEADER -->
+
+    <header>
+
+        <h1>
+            Police Crime Record Management System
+        </h1>
+
+        <div class="header-buttons">
+
+            <button
+                class="dashboard-btn"
+                onclick="goToDashboard()">
+                Dashboard
+            </button>
+
+            <button
+                class="logout-btn"
+                onclick="logout()">
+                Logout
+            </button>
+
+        </div>
+
+    </header>
+
+
+    <!-- MAIN -->
+
+    <div class="container">
+
+        <!-- ERROR -->
+
+        <div
+            id="errorMessage"
+            class="error">
+        </div>
+
+
+        <!-- FIR SUMMARY -->
+
+        <div class="section">
+
+            <h2>
+                FIR Summary
+            </h2>
+
+            <div class="cards">
+
+                <div class="card">
+
+                    <h3>
+                        Total FIRs
+                    </h3>
+
+                    <div
+                        id="totalFIRs"
+                        class="number">
+                        -
+                    </div>
+
+                </div>
+
+
+                <div class="card">
+
+                    <h3>
+                        Open FIRs
+                    </h3>
+
+                    <div
+                        id="openFIRs"
+                        class="number">
+                        -
+                    </div>
+
+                </div>
+
+
+                <div class="card">
+
+                    <h3>
+                        Closed FIRs
+                    </h3>
+
+                    <div
+                        id="closedFIRs"
+                        class="number">
+                        -
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- CRIMINAL SUMMARY -->
+
+        <div class="section">
+
+            <h2>
+                Criminal Records Summary
+            </h2>
+
+            <div class="cards">
+
+                <div class="card">
+
+                    <h3>
+                        Total Criminals
+                    </h3>
+
+                    <div
+                        id="totalCriminals"
+                        class="number">
+                        -
+                    </div>
+
+                </div>
+
+
+                <div class="card">
+
+                    <h3>
+                        Active Criminals
+                    </h3>
+
+                    <div
+                        id="activeCriminals"
+                        class="number">
+                        -
+                    </div>
+
+                </div>
+
+
+                <div class="card">
+
+                    <h3>
+                        Inactive Criminals
+                    </h3>
+
+                    <div
+                        id="inactiveCriminals"
+                        class="number">
+                        -
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- FIR REPORT -->
+
+        <div class="section">
+
+            <h2>
+                FIR Report
+            </h2>
+
+            <div class="table-container">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>FIR Number</th>
+                            <th>Date</th>
+                            <th>Complainant</th>
+                            <th>Contact</th>
+                            <th>Location</th>
+                            <th>Status</th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody id="firTableBody">
+
+                        <tr>
+
+                            <td
+                                colspan="6"
+                                class="loading">
+
+                                Loading FIR records...
+
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+
+        <!-- CRIMINAL REPORT -->
+
+        <div class="section">
+
+            <h2>
+                Criminal Records Report
+            </h2>
+
+            <div class="table-container">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>Criminal ID</th>
+                            <th>Name</th>
+                            <th>Date of Birth</th>
+                            <th>Gender</th>
+                            <th>Phone</th>
+                            <th>Status</th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody id="criminalTableBody">
+
+                        <tr>
+
+                            <td
+                                colspan="6"
+                                class="loading">
+
+                                Loading criminal records...
+
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- JAVASCRIPT -->
+
+    <script>
+
+        const API_BASE =
+            "http://localhost:8080";
+
+
+        /*
+         * GET LOGGED-IN USER
+         */
+
+        const user =
+            JSON.parse(
+                sessionStorage.getItem("pcrmsUser")
+            );
+
+
+        /*
+         * CHECK LOGIN
+         */
+
+        if (!user || !user.token) {
+
+            window.location.href =
+                "../index.html";
+
+        }
+
+
+        /*
+         * AUTHORIZATION HEADER
+         */
+
+        function getHeaders() {
+
+            return {
+                "Authorization":
+                    "Bearer " + user.token
+            };
+
+        }
+
+
+        /*
+         * SHOW ERROR
+         */
+
+        function showError(message) {
+
+            const errorBox =
+                document.getElementById(
+                    "errorMessage"
+                );
+
+            errorBox.textContent =
+                message;
+
+            errorBox.style.display =
+                "block";
+
+        }
+
+
+        /*
+         * ESCAPE HTML
+         */
+
+        function escapeHtml(value) {
+
+            if (
+                value === null ||
+                value === undefined
+            ) {
+
+                return "";
+
+            }
+
+            return String(value)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+
+        }
+
+
+        /*
+         * LOAD FIR SUMMARY
+         */
+
+        async function loadFIRSummary() {
+
+            try {
+
+                const response =
+                    await fetch(
+                        API_BASE +
+                        "/api/reports/fir-summary",
+                        {
+                            headers:
+                                getHeaders()
+                        }
+                    );
+
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        "Unable to load FIR summary. HTTP " +
+                        response.status
+                    );
+
+                }
+
+
+                const data =
+                    await response.json();
+
+
+                document.getElementById(
+                    "totalFIRs"
+                ).textContent =
+                    data.totalFIRs;
+
+
+                document.getElementById(
+                    "openFIRs"
+                ).textContent =
+                    data.openFIRs;
+
+
+                document.getElementById(
+                    "closedFIRs"
+                ).textContent =
+                    data.closedFIRs;
+
+
+            } catch (error) {
+
+                showError(
+                    error.message
+                );
+
+            }
+
+        }
+
+
+        /*
+         * LOAD CRIMINAL SUMMARY
+         */
+
+        async function loadCriminalSummary() {
+
+            try {
+
+                const response =
+                    await fetch(
+                        API_BASE +
+                        "/api/reports/criminal-summary",
+                        {
+                            headers:
+                                getHeaders()
+                        }
+                    );
+
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        "Unable to load criminal summary. HTTP " +
+                        response.status
+                    );
+
+                }
+
+
+                const data =
+                    await response.json();
+
+
+                document.getElementById(
+                    "totalCriminals"
+                ).textContent =
+                    data.totalCriminals;
+
+
+                document.getElementById(
+                    "activeCriminals"
+                ).textContent =
+                    data.activeCriminals;
+
+
+                document.getElementById(
+                    "inactiveCriminals"
+                ).textContent =
+                    data.inactiveCriminals;
+
+
+            } catch (error) {
+
+                showError(
+                    error.message
+                );
+
+            }
+
+        }
+
+
+        /*
+         * LOAD FIR RECORDS
+         */
+
+        async function loadFIRRecords() {
+
+            const tableBody =
+                document.getElementById(
+                    "firTableBody"
+                );
+
+
+            try {
+
+                const response =
+                    await fetch(
+                        API_BASE +
+                        "/api/firs",
+                        {
+                            headers:
+                                getHeaders()
+                        }
+                    );
+
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        "Unable to load FIR records. HTTP " +
+                        response.status
+                    );
+
+                }
+
+
+                const data =
+                    await response.json();
+
+
+                tableBody.innerHTML = "";
+
+
+                if (
+                    !Array.isArray(data) ||
+                    data.length === 0
+                ) {
+
+                    tableBody.innerHTML = `
+                        <tr>
+                            <td
+                                colspan="6"
+                                class="empty">
+
+                                No FIR records found.
+
+                            </td>
+                        </tr>
+                    `;
+
+                    return;
+
+                }
+
+
+                data.forEach(fir => {
+
+                    const row =
+                        document.createElement("tr");
+
+
+                    const status =
+                        String(
+                            fir.status || ""
+                        ).toUpperCase();
+
+
+                    const statusClass =
+                        status === "OPEN"
+                            ? "status-open"
+                            : "status-closed";
+
+
+                    row.innerHTML = `
+
+                        <td>
+                            ${escapeHtml(
+                                fir.firNumber
+                            )}
+                        </td>
+
+                        <td>
+                            ${escapeHtml(
+                                fir.date
+                            )}
+                        </td>
+
+                        <td>
+                            ${escapeHtml(
+                                fir.complainantName
+                            )}
+                        </td>
+
+                        <td>
+                            ${escapeHtml(
+                                fir.complainantContact
+                            )}
+                        </td>
+
+                        <td>
+                            ${escapeHtml(
+                                fir.incidentLocation
+                            )}
+                        </td>
+
+                        <td>
+
+                            <span
+                                class="status ${statusClass}">
+
+                                ${escapeHtml(
+                                    status
+                                )}
+
+                            </span>
+
+                        </td>
+
+                    `;
+
+
+                    tableBody.appendChild(row);
+
+                });
+
+
+            } catch (error) {
+
+                tableBody.innerHTML = `
+                    <tr>
+                        <td
+                            colspan="6"
+                            class="empty">
+
+                            Unable to load FIR records.
+
+                        </td>
+                    </tr>
+                `;
+
+
+                showError(
+                    error.message
+                );
+
+            }
+
+        }
+
+
+        /*
+         * LOAD CRIMINAL RECORDS
+         */
+
+        async function loadCriminalRecords() {
+
+            const tableBody =
+                document.getElementById(
+                    "criminalTableBody"
+                );
+
+
+            try {
+
+                const response =
+                    await fetch(
+                        API_BASE +
+                        "/api/criminal-records",
+                        {
+                            headers:
+                                getHeaders()
+                        }
+                    );
+
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        "Unable to load criminal records. HTTP " +
+                        response.status
+                    );
+
+                }
+
+
+                const data =
+                    await response.json();
+
+
+                tableBody.innerHTML = "";
+
+
+                if (
+                    !Array.isArray(data) ||
+                    data.length === 0
+                ) {
+
+                    tableBody.innerHTML = `
+                        <tr>
+                            <td
+                                colspan="6"
+                                class="empty">
+
+                                No criminal records found.
+
+                            </td>
+                        </tr>
+                    `;
+
+                    return;
+
+                }
+
+
+                data.forEach(criminal => {
+
+                    const row =
+                        document.createElement("tr");
+
+
+                    const status =
+                        String(
+                            criminal.status || ""
+                        ).toUpperCase();
+
+
+                    const statusClass =
+                        status === "ACTIVE"
+                            ? "status-active"
+                            : "status-inactive";
+
+
+                    row.innerHTML = `
+
+                        <td>
+                            ${escapeHtml(
+                                criminal.criminalId
+                            )}
+                        </td>
+
+                        <td>
+                            ${escapeHtml(
+                                criminal.fullName
+                            )}
+                        </td>
+
+                        <td>
+                            ${escapeHtml(
+                                criminal.dateOfBirth
+                            )}
+                        </td>
+
+                        <td>
+                            ${escapeHtml(
+                                criminal.gender
+                            )}
+                        </td>
+
+                        <td>
+                            ${escapeHtml(
+                                criminal.phone
+                            )}
+                        </td>
+
+                        <td>
+
+                            <span
+                                class="status ${statusClass}">
+
+                                ${escapeHtml(
+                                    status
+                                )}
+
+                            </span>
+
+                        </td>
+
+                    `;
+
+
+                    tableBody.appendChild(row);
+
+                });
+
+
+            } catch (error) {
+
+                tableBody.innerHTML = `
+                    <tr>
+                        <td
+                            colspan="6"
+                            class="empty">
+
+                            Unable to load criminal records.
+
+                        </td>
+                    </tr>
+                `;
+
+
+                showError(
+                    error.message
+                );
+
+            }
+
+        }
+
+
+        /*
+         * GO TO DASHBOARD
+         */
+
+        function goToDashboard() {
+
+            window.location.href =
+                "dashboard.html";
+
+        }
+
+
+        /*
+         * LOGOUT
+         */
+
+        function logout() {
+
+            sessionStorage.removeItem(
+                "pcrmsUser"
+            );
+
+            window.location.href =
+                "../index.html";
+
+        }
+
+
+        /*
+         * LOAD EVERYTHING
+         */
+
+        loadFIRSummary();
+
+        loadCriminalSummary();
+
+        loadFIRRecords();
+
+        loadCriminalRecords();
+
+    </script>
+
+</body>
+
+</html>

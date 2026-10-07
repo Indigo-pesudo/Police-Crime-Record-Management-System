@@ -1,0 +1,1868 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Criminal Records - PCRMS</title>
+
+    <style>
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background: #f4f6f9;
+        }
+
+        .container {
+            width: 92%;
+            max-width: 1200px;
+            margin: 30px auto;
+        }
+
+        .back {
+            text-decoration: none;
+            color: #0f2041;
+            font-weight: bold;
+        }
+
+        h1 {
+            color: #0f2041;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            margin-top: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .row {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        input,
+        select,
+        button {
+            padding: 11px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            font-size: 14px;
+        }
+
+        input {
+            flex: 1;
+            min-width: 220px;
+        }
+
+        button {
+            background: #0f2041;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        .secondary {
+            background: #666;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th,
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+            text-align: left;
+        }
+
+        th {
+            background: #0f2041;
+            color: white;
+        }
+
+        .empty {
+            text-align: center;
+            padding: 25px;
+            color: #777;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .form-grid input {
+            width: auto;
+        }
+
+        @media (max-width: 700px) {
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            table {
+                display: block;
+                overflow-x: auto;
+            }
+
+        }
+
+        .message {
+            margin-top: 12px;
+            font-weight: bold;
+        }
+
+        /* FIR */
+
+        .fir-item {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-top: 10px;
+            border-radius: 8px;
+            background: #f9fafc;
+        }
+
+        .fir-item button {
+            margin-top: 10px;
+            margin-right: 8px;
+        }
+
+        /* CASE */
+
+        .case-details {
+            margin-top: 20px;
+            padding: 20px;
+            border-left: 4px solid #0f2041;
+            background: #f4f6f9;
+            border-radius: 8px;
+        }
+
+        .case-details h3 {
+            color: #0f2041;
+            margin-top: 0;
+        }
+
+        .case-row {
+            margin: 8px 0;
+        }
+
+        .case-row strong {
+            display: inline-block;
+            width: 180px;
+        }
+
+        /* FIR DETAILS */
+
+        .fir-details {
+            margin-top: 20px;
+            padding: 20px;
+            border-left: 4px solid #0f2041;
+            background: #f4f6f9;
+            border-radius: 8px;
+        }
+
+        .fir-details h3 {
+            color: #0f2041;
+            margin-top: 0;
+        }
+
+        /* STATUS */
+
+        .status {
+            font-weight: bold;
+        }
+
+    </style>
+</head>
+
+
+<body>
+
+<div class="container">
+
+    <!-- BACK -->
+
+    <a href="dashboard.html" class="back">
+        ← Back to Dashboard
+    </a>
+
+    <h1>Criminal Records</h1>
+
+
+    <!-- ================================================= -->
+    <!-- SEARCH CRIMINAL RECORDS -->
+    <!-- ================================================= -->
+
+    <div class="card">
+
+        <h2>Search Criminal Records</h2>
+
+        <div class="row">
+
+            <select id="searchType">
+
+                <option value="criminalId">
+                    Criminal ID
+                </option>
+
+                <option value="fullName">
+                    Name
+                </option>
+
+                <option value="phone">
+                    Phone
+                </option>
+
+                <option value="status">
+                    Status
+                </option>
+
+            </select>
+
+
+            <input
+                type="text"
+                id="searchValue"
+                placeholder="Enter search value"
+            >
+
+
+            <button onclick="searchCriminals()">
+                Search
+            </button>
+
+
+            <button
+                class="secondary"
+                onclick="loadAllRecords()"
+            >
+                Show All
+            </button>
+
+        </div>
+
+
+        <div
+            id="searchMessage"
+            class="message"
+        ></div>
+
+    </div>
+
+
+    <!-- ================================================= -->
+    <!-- ADD CRIMINAL RECORD -->
+    <!-- ================================================= -->
+
+    <div class="card">
+
+        <h2>Add Criminal Record</h2>
+
+
+        <div class="form-grid">
+
+            <input
+                id="criminalId"
+                placeholder="Criminal ID"
+            >
+
+            <input
+                id="fullName"
+                placeholder="Full Name"
+            >
+
+            <input
+                id="dateOfBirth"
+                placeholder="Date of Birth"
+            >
+
+            <input
+                id="gender"
+                placeholder="Gender"
+            >
+
+            <input
+                id="phone"
+                placeholder="Phone"
+            >
+
+            <input
+                id="address"
+                placeholder="Address"
+            >
+
+            <input
+                id="identificationMark"
+                placeholder="Identification Mark"
+            >
+
+
+            <select id="status">
+
+                <option value="ACTIVE">
+                    ACTIVE
+                </option>
+
+                <option value="INACTIVE">
+                    INACTIVE
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <br>
+
+
+        <button onclick="createRecord()">
+            Add Criminal Record
+        </button>
+
+
+        <div
+            id="createMessage"
+            class="message"
+        ></div>
+
+    </div>
+
+
+    <!-- ================================================= -->
+    <!-- ASSOCIATE CRIMINAL WITH FIR -->
+    <!-- ================================================= -->
+
+    <div class="card">
+
+        <h2>Associate Criminal with FIR</h2>
+
+
+        <div class="row">
+
+            <input
+                type="number"
+                id="associateCriminalId"
+                placeholder="Criminal Database ID"
+            >
+
+
+            <input
+                type="number"
+                id="associateFirId"
+                placeholder="FIR Database ID"
+            >
+
+
+            <button onclick="associateFIR()">
+                Associate FIR
+            </button>
+
+        </div>
+
+
+        <div
+            id="associateMessage"
+            class="message"
+        ></div>
+
+    </div>
+
+
+    <!-- ================================================= -->
+    <!-- CRIMINAL RECORD RESULTS -->
+    <!-- ================================================= -->
+
+    <div class="card">
+
+        <h2>Records</h2>
+
+
+        <div id="resultsContainer">
+
+            <div class="empty">
+                Search for a criminal or click Show All.
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ================================================= -->
+    <!-- ASSOCIATED FIR / CASE DETAILS -->
+    <!-- ================================================= -->
+
+    <div
+        class="card"
+        id="caseDetailsContainer"
+        style="display: none;"
+    >
+
+        <h2>Associated FIRs</h2>
+
+
+        <div id="associatedFIRContainer"></div>
+
+
+        <div id="firDetails"></div>
+
+
+        <div id="caseDetails"></div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+
+/* =====================================================
+   USER SESSION
+   ===================================================== */
+
+const user = JSON.parse(
+    sessionStorage.getItem("pcrmsUser")
+);
+
+
+if (!user || !user.token) {
+
+    window.location.href = "../index.html";
+
+}
+
+
+/* =====================================================
+   API
+   ===================================================== */
+
+const API =
+    "http://localhost:8080/api/criminal-records";
+
+
+/* =====================================================
+   SEARCH CRIMINAL RECORDS
+   ===================================================== */
+
+async function searchCriminals() {
+
+    const type =
+        document.getElementById("searchType").value;
+
+
+    const value =
+        document
+            .getElementById("searchValue")
+            .value
+            .trim();
+
+
+    const message =
+        document.getElementById("searchMessage");
+
+
+    message.textContent = "";
+
+
+    if (!value) {
+
+        message.textContent =
+            "Please enter a search value.";
+
+        return;
+    }
+
+
+    try {
+
+        const response =
+            await fetch(
+                `${API}/search?${encodeURIComponent(type)}=${encodeURIComponent(value)}`,
+                {
+                    headers: {
+                        "Authorization":
+                            `Bearer ${user.token}`
+                    }
+                }
+            );
+
+
+        const responseText =
+            await response.text();
+
+
+        let data = [];
+
+
+        if (responseText.trim()) {
+
+            try {
+
+                data =
+                    JSON.parse(responseText);
+
+            } catch (error) {
+
+                console.error(
+                    "Invalid JSON response:",
+                    responseText
+                );
+
+            }
+
+        }
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                data.message ||
+                `Unable to load records. HTTP ${response.status}`
+            );
+
+        }
+
+
+        displayRecords(data);
+
+
+    } catch (error) {
+
+        console.error(
+            "Search error:",
+            error
+        );
+
+
+        document
+            .getElementById("resultsContainer")
+            .innerHTML =
+            `<div class="empty">
+                ${escapeHtml(error.message)}
+            </div>`;
+
+    }
+
+}
+
+
+/* =====================================================
+   LOAD ALL CRIMINAL RECORDS
+   ===================================================== */
+
+async function loadAllRecords() {
+
+    try {
+
+        const response =
+            await fetch(
+                API,
+                {
+                    headers: {
+                        "Authorization":
+                            `Bearer ${user.token}`
+                    }
+                }
+            );
+
+
+        const responseText =
+            await response.text();
+
+
+        let data = [];
+
+
+        if (responseText.trim()) {
+
+            try {
+
+                data =
+                    JSON.parse(responseText);
+
+            } catch (error) {
+
+                console.error(
+                    "Invalid JSON response:",
+                    responseText
+                );
+
+            }
+
+        }
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                data.message ||
+                `Unable to load records. HTTP ${response.status}`
+            );
+
+        }
+
+
+        displayRecords(data);
+
+
+    } catch (error) {
+
+        console.error(
+            "Load records error:",
+            error
+        );
+
+
+        document
+            .getElementById("resultsContainer")
+            .innerHTML =
+            `<div class="empty">
+                ${escapeHtml(error.message)}
+            </div>`;
+
+    }
+
+}
+
+
+/* =====================================================
+   CREATE CRIMINAL RECORD
+   ===================================================== */
+
+async function createRecord() {
+
+    const record = {
+
+        criminalId:
+            document
+                .getElementById("criminalId")
+                .value
+                .trim(),
+
+
+        fullName:
+            document
+                .getElementById("fullName")
+                .value
+                .trim(),
+
+
+        dateOfBirth:
+            document
+                .getElementById("dateOfBirth")
+                .value
+                .trim(),
+
+
+        gender:
+            document
+                .getElementById("gender")
+                .value
+                .trim(),
+
+
+        phone:
+            document
+                .getElementById("phone")
+                .value
+                .trim(),
+
+
+        address:
+            document
+                .getElementById("address")
+                .value
+                .trim(),
+
+
+        identificationMark:
+            document
+                .getElementById("identificationMark")
+                .value
+                .trim(),
+
+
+        status:
+            document
+                .getElementById("status")
+                .value
+
+    };
+
+
+    const message =
+        document.getElementById("createMessage");
+
+
+    message.textContent = "";
+
+
+    if (
+        !record.criminalId ||
+        !record.fullName
+    ) {
+
+        message.textContent =
+            "Criminal ID and Full Name are required.";
+
+        return;
+
+    }
+
+
+    try {
+
+        const response =
+            await fetch(
+                API,
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json",
+
+                        "Authorization":
+                            `Bearer ${user.token}`
+                    },
+
+                    body:
+                        JSON.stringify(record)
+                }
+            );
+
+
+        const responseText =
+            await response.text();
+
+
+        console.log(
+            "HTTP Status:",
+            response.status
+        );
+
+
+        console.log(
+            "Response:",
+            responseText
+        );
+
+
+        let data = {};
+
+
+        if (responseText.trim()) {
+
+            try {
+
+                data =
+                    JSON.parse(responseText);
+
+            } catch (error) {
+
+                console.error(
+                    "Response was not JSON:",
+                    responseText
+                );
+
+            }
+
+        }
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                data.message ||
+                `Unable to create record. HTTP ${response.status}`
+            );
+
+        }
+
+
+        message.textContent =
+            "Criminal record created successfully.";
+
+
+        clearForm();
+
+
+        await loadAllRecords();
+
+
+    } catch (error) {
+
+        console.error(
+            "Create criminal record error:",
+            error
+        );
+
+
+        message.textContent =
+            error.message;
+
+    }
+
+}
+
+
+/* =====================================================
+   DISPLAY CRIMINAL RECORDS
+   ===================================================== */
+
+function displayRecords(records) {
+
+    const container =
+        document.getElementById(
+            "resultsContainer"
+        );
+
+
+    if (
+        !records ||
+        !Array.isArray(records) ||
+        records.length === 0
+    ) {
+
+        container.innerHTML =
+            `
+            <div class="empty">
+                No records found.
+            </div>
+            `;
+
+        return;
+
+    }
+
+
+    let html = `
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>Criminal ID</th>
+
+                    <th>Name</th>
+
+                    <th>Date of Birth</th>
+
+                    <th>Gender</th>
+
+                    <th>Phone</th>
+
+                    <th>Status</th>
+
+                    <th>Action</th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+    `;
+
+
+    records.forEach(record => {
+
+        html += `
+
+            <tr>
+
+                <td>
+                    ${escapeHtml(
+                        record.criminalId ?? ""
+                    )}
+                </td>
+
+
+                <td>
+                    ${escapeHtml(
+                        record.fullName ?? ""
+                    )}
+                </td>
+
+
+                <td>
+                    ${escapeHtml(
+                        record.dateOfBirth ?? ""
+                    )}
+                </td>
+
+
+                <td>
+                    ${escapeHtml(
+                        record.gender ?? ""
+                    )}
+                </td>
+
+
+                <td>
+                    ${escapeHtml(
+                        record.phone ?? ""
+                    )}
+                </td>
+
+
+                <td class="status">
+                    ${escapeHtml(
+                        record.status ?? ""
+                    )}
+                </td>
+
+
+                <td>
+
+                    <button
+                        onclick="viewAssociatedFIRs(${record.id})"
+                    >
+                        View FIRs
+                    </button>
+
+                </td>
+
+            </tr>
+
+        `;
+
+    });
+
+
+    html += `
+
+            </tbody>
+
+        </table>
+
+    `;
+
+
+    container.innerHTML =
+        html;
+
+}
+
+
+/* =====================================================
+   VIEW ASSOCIATED FIRs
+   ===================================================== */
+
+async function viewAssociatedFIRs(
+    criminalId
+) {
+
+    try {
+
+        const response =
+            await fetch(
+                `http://localhost:8080/api/criminal-fir-links/criminal/${criminalId}`,
+                {
+                    headers: {
+                        "Authorization":
+                            `Bearer ${user.token}`
+                    }
+                }
+            );
+
+
+        const responseText =
+            await response.text();
+
+
+        let firs = [];
+
+
+        if (responseText.trim()) {
+
+            try {
+
+                firs =
+                    JSON.parse(responseText);
+
+            } catch (error) {
+
+                console.error(
+                    "Invalid JSON response:",
+                    responseText
+                );
+
+            }
+
+        }
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                firs.message ||
+                `Unable to load associated FIRs. HTTP ${response.status}`
+            );
+
+        }
+
+
+        const container =
+            document.getElementById(
+                "caseDetailsContainer"
+            );
+
+
+        const firContainer =
+            document.getElementById(
+                "associatedFIRContainer"
+            );
+
+
+        const firDetailsContainer =
+            document.getElementById(
+                "firDetails"
+            );
+
+
+        const caseContainer =
+            document.getElementById(
+                "caseDetails"
+            );
+
+
+        container.style.display =
+            "block";
+
+
+        firDetailsContainer.innerHTML =
+            "";
+
+
+        caseContainer.innerHTML =
+            "";
+
+
+        if (
+            !firs ||
+            firs.length === 0
+        ) {
+
+            firContainer.innerHTML =
+                `
+                <div class="empty">
+
+                    No FIRs are associated
+                    with this criminal.
+
+                </div>
+                `;
+
+            return;
+
+        }
+
+
+        let html = "";
+
+
+        firs.forEach(fir => {
+
+            html += `
+
+                <div class="fir-item">
+
+                    <strong>
+                        ${escapeHtml(
+                            fir.firNumber ?? ""
+                        )}
+                    </strong>
+
+
+                    <div>
+
+                        Status:
+                        ${escapeHtml(
+                            fir.status ?? ""
+                        )}
+
+                    </div>
+
+
+                    <div>
+
+                        Location:
+                        ${escapeHtml(
+                            fir.incidentLocation ?? ""
+                        )}
+
+                    </div>
+
+
+                    <button
+                        onclick="viewFIRDetails(${fir.id})"
+                    >
+                        View FIR
+                    </button>
+
+
+                    <button
+                        onclick="viewCaseByFIR('${escapeHtml(
+                            fir.firNumber ?? ""
+                        )}')"
+                    >
+                        View Case
+                    </button>
+
+                </div>
+
+            `;
+
+        });
+
+
+        firContainer.innerHTML =
+            html;
+
+
+        container.scrollIntoView({
+            behavior: "smooth"
+        });
+
+
+    } catch (error) {
+
+        console.error(
+            "Associated FIR error:",
+            error
+        );
+
+
+        document
+            .getElementById(
+                "associatedFIRContainer"
+            )
+            .innerHTML =
+            `
+            <div class="empty">
+
+                ${escapeHtml(
+                    error.message
+                )}
+
+            </div>
+            `;
+
+    }
+
+}
+
+
+/* =====================================================
+   VIEW FIR DETAILS
+   ===================================================== */
+
+async function viewFIRDetails(
+    firId
+) {
+
+    try {
+
+        const response =
+            await fetch(
+                `http://localhost:8080/api/firs/${firId}`,
+                {
+                    headers: {
+                        "Authorization":
+                            `Bearer ${user.token}`
+                    }
+                }
+            );
+
+
+        const responseText =
+            await response.text();
+
+
+        let fir = {};
+
+
+        if (responseText.trim()) {
+
+            try {
+
+                fir =
+                    JSON.parse(responseText);
+
+            } catch (error) {
+
+                console.error(
+                    "Invalid FIR JSON:",
+                    responseText
+                );
+
+            }
+
+        }
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                fir.message ||
+                `Unable to load FIR details. HTTP ${response.status}`
+            );
+
+        }
+
+
+        const container =
+            document.getElementById(
+                "firDetails"
+            );
+
+
+        container.innerHTML = `
+
+            <div class="fir-details">
+
+                <h3>
+                    FIR Details
+                </h3>
+
+
+                <div class="case-row">
+
+                    <strong>
+                        FIR Number:
+                    </strong>
+
+                    ${escapeHtml(
+                        fir.firNumber ?? ""
+                    )}
+
+                </div>
+
+
+                <div class="case-row">
+
+                    <strong>
+                        Date:
+                    </strong>
+
+                    ${escapeHtml(
+                        fir.date ?? ""
+                    )}
+
+                </div>
+
+
+                <div class="case-row">
+
+                    <strong>
+                        Complainant:
+                    </strong>
+
+                    ${escapeHtml(
+                        fir.complainantName ?? ""
+                    )}
+
+                </div>
+
+
+                <div class="case-row">
+
+                    <strong>
+                        Contact:
+                    </strong>
+
+                    ${escapeHtml(
+                        fir.complainantContact ?? ""
+                    )}
+
+                </div>
+
+
+                <div class="case-row">
+
+                    <strong>
+                        Incident Location:
+                    </strong>
+
+                    ${escapeHtml(
+                        fir.incidentLocation ?? ""
+                    )}
+
+                </div>
+
+
+                <div class="case-row">
+
+                    <strong>
+                        Status:
+                    </strong>
+
+                    ${escapeHtml(
+                        fir.status ?? ""
+                    )}
+
+                </div>
+
+
+                <div class="case-row">
+
+                    <strong>
+                        Description:
+                    </strong>
+
+                    ${escapeHtml(
+                        fir.description ?? ""
+                    )}
+
+                </div>
+
+            </div>
+
+        `;
+
+
+        container.scrollIntoView({
+            behavior: "smooth"
+        });
+
+
+    } catch (error) {
+
+        console.error(
+            "FIR details error:",
+            error
+        );
+
+
+        document
+            .getElementById(
+                "firDetails"
+            )
+            .innerHTML =
+            `
+            <div class="fir-details">
+
+                <strong>
+                    Error:
+                </strong>
+
+                ${escapeHtml(
+                    error.message
+                )}
+
+            </div>
+            `;
+
+    }
+
+}
+
+
+/* =====================================================
+   VIEW CASE BY FIR NUMBER
+   ===================================================== */
+
+async function viewCaseByFIR(
+    firNumber
+) {
+
+    try {
+
+        const response =
+            await fetch(
+                `http://localhost:8080/api/cases/fir/${encodeURIComponent(firNumber)}`,
+                {
+                    headers: {
+                        "Authorization":
+                            `Bearer ${user.token}`
+                    }
+                }
+            );
+
+
+        const responseText =
+            await response.text();
+
+
+        let cases = [];
+
+
+        if (responseText.trim()) {
+
+            try {
+
+                cases =
+                    JSON.parse(responseText);
+
+            } catch (error) {
+
+                console.error(
+                    "Invalid case JSON:",
+                    responseText
+                );
+
+            }
+
+        }
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                `Unable to load case details. HTTP ${response.status}`
+            );
+
+        }
+
+
+        const caseContainer =
+            document.getElementById(
+                "caseDetails"
+            );
+
+
+        if (
+            !cases ||
+            cases.length === 0
+        ) {
+
+            caseContainer.innerHTML =
+                `
+
+                <div class="case-details">
+
+                    <h3>
+                        No Case Found
+                    </h3>
+
+                    <p>
+
+                        No case is currently
+                        associated with
+
+                        <strong>
+                            ${escapeHtml(
+                                firNumber
+                            )}
+                        </strong>.
+
+                    </p>
+
+                </div>
+
+                `;
+
+            return;
+
+        }
+
+
+        let html = "";
+
+
+        cases.forEach(caseData => {
+
+            html += `
+
+                <div class="case-details">
+
+                    <h3>
+                        Case Details
+                    </h3>
+
+
+                    <div class="case-row">
+
+                        <strong>
+                            Case Number:
+                        </strong>
+
+                        ${escapeHtml(
+                            caseData.caseNumber ?? ""
+                        )}
+
+                    </div>
+
+
+                    <div class="case-row">
+
+                        <strong>
+                            FIR Number:
+                        </strong>
+
+                        ${escapeHtml(
+                            caseData.firNumber ?? ""
+                        )}
+
+                    </div>
+
+
+                    <div class="case-row">
+
+                        <strong>
+                            Title:
+                        </strong>
+
+                        ${escapeHtml(
+                            caseData.title ?? ""
+                        )}
+
+                    </div>
+
+
+                    <div class="case-row">
+
+                        <strong>
+                            Investigating Officer:
+                        </strong>
+
+                        ${escapeHtml(
+                            caseData.investigatingOfficer ?? ""
+                        )}
+
+                    </div>
+
+
+                    <div class="case-row">
+
+                        <strong>
+                            Opened Date:
+                        </strong>
+
+                        ${escapeHtml(
+                            caseData.openedDate ?? ""
+                        )}
+
+                    </div>
+
+
+                    <div class="case-row">
+
+                        <strong>
+                            Status:
+                        </strong>
+
+                        ${escapeHtml(
+                            caseData.status ?? ""
+                        )}
+
+                    </div>
+
+
+                    <div class="case-row">
+
+                        <strong>
+                            Description:
+                        </strong>
+
+                        ${escapeHtml(
+                            caseData.description ?? ""
+                        )}
+
+                    </div>
+
+                </div>
+
+            `;
+
+        });
+
+
+        caseContainer.innerHTML =
+            html;
+
+
+        caseContainer.scrollIntoView({
+            behavior: "smooth"
+        });
+
+
+    } catch (error) {
+
+        console.error(
+            "Case details error:",
+            error
+        );
+
+
+        document
+            .getElementById(
+                "caseDetails"
+            )
+            .innerHTML =
+            `
+
+            <div class="case-details">
+
+                <strong>
+                    Error:
+                </strong>
+
+                ${escapeHtml(
+                    error.message
+                )}
+
+            </div>
+
+            `;
+
+    }
+
+}
+
+
+/* =====================================================
+   ASSOCIATE CRIMINAL WITH FIR
+   ===================================================== */
+
+async function associateFIR() {
+
+    const criminalId =
+        document
+            .getElementById(
+                "associateCriminalId"
+            )
+            .value
+            .trim();
+
+
+    const firId =
+        document
+            .getElementById(
+                "associateFirId"
+            )
+            .value
+            .trim();
+
+
+    const message =
+        document.getElementById(
+            "associateMessage"
+        );
+
+
+    message.textContent =
+        "";
+
+
+    if (
+        !criminalId ||
+        !firId
+    ) {
+
+        message.textContent =
+            "Both Criminal Database ID and FIR Database ID are required.";
+
+        return;
+
+    }
+
+
+    try {
+
+        const response =
+            await fetch(
+                `http://localhost:8080/api/criminal-fir-links?criminalId=${encodeURIComponent(
+                    criminalId
+                )}&firId=${encodeURIComponent(
+                    firId
+                )}`,
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Authorization":
+                            `Bearer ${user.token}`
+                    }
+                }
+            );
+
+
+        const responseText =
+            await response.text();
+
+
+        console.log(
+            "HTTP Status:",
+            response.status
+        );
+
+
+        console.log(
+            "Response:",
+            responseText
+        );
+
+
+        let data = {};
+
+
+        if (responseText.trim()) {
+
+            try {
+
+                data =
+                    JSON.parse(responseText);
+
+            } catch (error) {
+
+                console.error(
+                    "Response is not valid JSON:",
+                    responseText
+                );
+
+            }
+
+        }
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                data.message ||
+                `Unable to associate FIR. HTTP ${response.status}`
+            );
+
+        }
+
+
+        message.textContent =
+            "FIR associated successfully.";
+
+
+        document
+            .getElementById(
+                "associateCriminalId"
+            )
+            .value = "";
+
+
+        document
+            .getElementById(
+                "associateFirId"
+            )
+            .value = "";
+
+
+    } catch (error) {
+
+        console.error(
+            "Associate FIR error:",
+            error
+        );
+
+
+        message.textContent =
+            error.message;
+
+    }
+
+}
+
+
+/* =====================================================
+   CLEAR ADD RECORD FORM
+   ===================================================== */
+
+function clearForm() {
+
+    document
+        .getElementById("criminalId")
+        .value = "";
+
+
+    document
+        .getElementById("fullName")
+        .value = "";
+
+
+    document
+        .getElementById("dateOfBirth")
+        .value = "";
+
+
+    document
+        .getElementById("gender")
+        .value = "";
+
+
+    document
+        .getElementById("phone")
+        .value = "";
+
+
+    document
+        .getElementById("address")
+        .value = "";
+
+
+    document
+        .getElementById("identificationMark")
+        .value = "";
+
+
+    document
+        .getElementById("status")
+        .value = "ACTIVE";
+
+}
+
+
+/* =====================================================
+   HTML ESCAPE
+   ===================================================== */
+
+function escapeHtml(value) {
+
+    return String(value)
+
+        .replaceAll(
+            "&",
+            "&amp;"
+        )
+
+        .replaceAll(
+            "<",
+            "&lt;"
+        )
+
+        .replaceAll(
+            ">",
+            "&gt;"
+        )
+
+        .replaceAll(
+            '"',
+            "&quot;"
+        )
+
+        .replaceAll(
+            "'",
+            "&#039;"
+        );
+
+}
+
+</script>
+
+</body>
+</html>
